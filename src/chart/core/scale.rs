@@ -1,13 +1,15 @@
-use super::ChartCore;
 use super::super::data::{SeriesData, SeriesScale};
 use super::super::layout::ChartLayout;
 use super::super::options::PriceScaleOptions;
-use super::super::scales::{data_range_candles, data_range_line, merge_range, update_price_scale_state};
+use super::super::scales::{
+    data_range_candles, data_range_line, merge_range, update_price_scale_state,
+};
 use super::super::types::{PriceFormat, PriceScale, PriceScaleMode};
 use super::super::util::{
     candle_time, histogram_range, inverse_transform_price, transform_price, visible_candles,
     visible_histogram_points, visible_line_points,
 };
+use super::ChartCore;
 
 impl ChartCore {
     pub(super) fn has_data(&self) -> bool {
@@ -56,7 +58,14 @@ impl ChartCore {
         let range = data_range_line(&panel.data, start, end)?;
         let min = 0.0_f64.min(range.0);
         let max = 100.0_f64.max(range.1);
-        update_price_scale_state(&mut panel.scale, min, max, panel.options.auto_scale, panel.options.mode, base);
+        update_price_scale_state(
+            &mut panel.scale,
+            min,
+            max,
+            panel.options.auto_scale,
+            panel.options.mode,
+            base,
+        );
         Some(SeriesScale {
             min: panel.scale.view_min,
             max: panel.scale.view_max,

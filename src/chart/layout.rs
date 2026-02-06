@@ -82,12 +82,8 @@ impl ChartLayout {
         }
 
         let collapsed_height = chart.style.panel_toolbar_height.max(18.0);
-        let collapsed_total: f64 = chart
-            .panels
-            .iter()
-            .filter(|panel| panel.collapsed)
-            .count() as f64
-            * collapsed_height;
+        let collapsed_total: f64 =
+            chart.panels.iter().filter(|panel| panel.collapsed).count() as f64 * collapsed_height;
         let total_weight: f64 = chart
             .panels
             .iter()
@@ -96,11 +92,9 @@ impl ChartLayout {
             .sum();
 
         let time_axes_count = group_order.len();
-        let available_height = (height
-            - padding * 2.0
-            - time_axis_height * time_axes_count as f64
-            - collapsed_total)
-            .max(1.0);
+        let available_height =
+            (height - padding * 2.0 - time_axis_height * time_axes_count as f64 - collapsed_total)
+                .max(1.0);
         let unit_height = if total_weight > 0.0 {
             available_height / total_weight
         } else {
@@ -204,26 +198,41 @@ impl ChartLayout {
             .iter()
             .find(|panel| matches!(panel.role, super::types::PanelRole::Main))
             .or_else(|| panels.first());
-        let (plot_left, plot_right, plot_top, plot_bottom, plot_width, plot_height, main_bottom, main_height, hist_top, hist_bottom, hist_height, axis_left, axis_right) =
-            if let Some(panel) = main_panel {
-                (
-                    panel.plot_left,
-                    panel.plot_right,
-                    panel.top,
-                    panel.bottom,
-                    panel.plot_width,
-                    panel.height,
-                    panel.main_bottom,
-                    panel.main_height,
-                    panel.hist_top,
-                    panel.hist_bottom,
-                    panel.hist_height,
-                    panel.axis_left,
-                    panel.axis_right,
-                )
-            } else {
-                (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-            };
+        let (
+            plot_left,
+            plot_right,
+            plot_top,
+            plot_bottom,
+            plot_width,
+            plot_height,
+            main_bottom,
+            main_height,
+            hist_top,
+            hist_bottom,
+            hist_height,
+            axis_left,
+            axis_right,
+        ) = if let Some(panel) = main_panel {
+            (
+                panel.plot_left,
+                panel.plot_right,
+                panel.top,
+                panel.bottom,
+                panel.plot_width,
+                panel.height,
+                panel.main_bottom,
+                panel.main_height,
+                panel.hist_top,
+                panel.hist_bottom,
+                panel.hist_height,
+                panel.axis_left,
+                panel.axis_right,
+            )
+        } else {
+            (
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+            )
+        };
         let (rsi_top, rsi_bottom, rsi_height) = panels
             .iter()
             .find(|panel| {

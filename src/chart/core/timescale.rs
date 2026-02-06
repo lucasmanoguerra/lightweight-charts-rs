@@ -1,6 +1,6 @@
-use super::ChartCore;
 use super::super::options::TimeScaleOptions;
 use super::super::types::Color;
+use super::ChartCore;
 
 impl ChartCore {
     pub(crate) fn fit_content(&mut self) {
@@ -122,7 +122,8 @@ impl ChartCore {
         self.time_scale.set_fix_left_edge(options.fix_left_edge);
         self.time_scale.set_fix_right_edge(options.fix_right_edge);
         if options.right_offset_pixels > 0.0 {
-            self.time_scale.set_right_offset_pixels(options.right_offset_pixels);
+            self.time_scale
+                .set_right_offset_pixels(options.right_offset_pixels);
         } else {
             self.time_scale.set_right_offset(options.right_offset);
         }
@@ -132,10 +133,9 @@ impl ChartCore {
     pub(super) fn recalculate_time_scale_after_data_update(&mut self) {
         let prev_end = self.time_scale.end;
         let prev_range = self.time_scale.visible_range();
-        let prev_max_end =
-            self.time_scale.max + self.time_scale.effective_right_offset() * self.time_scale.bar_time();
-        let was_at_right =
-            (prev_end - prev_max_end).abs() <= self.time_scale.bar_time().max(1.0);
+        let prev_max_end = self.time_scale.max
+            + self.time_scale.effective_right_offset() * self.time_scale.bar_time();
+        let was_at_right = (prev_end - prev_max_end).abs() <= self.time_scale.bar_time().max(1.0);
 
         self.time_scale.recalculate(&self.series);
 
@@ -143,8 +143,8 @@ impl ChartCore {
             return;
         }
 
-        let max_end =
-            self.time_scale.max + self.time_scale.effective_right_offset() * self.time_scale.bar_time();
+        let max_end = self.time_scale.max
+            + self.time_scale.effective_right_offset() * self.time_scale.bar_time();
         let range = prev_range.max(1.0);
         let mut end = if was_at_right
             && self.options.time_scale.right_bar_stays_on_scroll
@@ -176,11 +176,14 @@ impl ChartCore {
         if self.last_plot_width <= 0.0 {
             return;
         }
-        let bar_spacing = self.time_scale.bar_spacing.max(self.time_scale.min_bar_spacing);
+        let bar_spacing = self
+            .time_scale
+            .bar_spacing
+            .max(self.time_scale.min_bar_spacing);
         let visible_bars = (self.last_plot_width / bar_spacing).max(1.0);
         let range = self.time_scale.bar_time() * visible_bars;
-        let max_end =
-            self.time_scale.max + self.time_scale.effective_right_offset() * self.time_scale.bar_time();
+        let max_end = self.time_scale.max
+            + self.time_scale.effective_right_offset() * self.time_scale.bar_time();
         let old_range = self.time_scale.visible_range();
         let anchor_time = self.time_scale.start + anchor.clamp(0.0, 1.0) * old_range;
         let mut start = anchor_time - anchor.clamp(0.0, 1.0) * range;
@@ -214,8 +217,8 @@ impl ChartCore {
         if !self.options.time_scale.right_bar_stays_on_scroll {
             return;
         }
-        let max_end =
-            self.time_scale.max + self.time_scale.effective_right_offset() * self.time_scale.bar_time();
+        let max_end = self.time_scale.max
+            + self.time_scale.effective_right_offset() * self.time_scale.bar_time();
         let range = self.time_scale.visible_range();
         if self.time_scale.end > max_end {
             self.time_scale.end = max_end;

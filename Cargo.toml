@@ -1,7 +1,17 @@
 [package]
 name = "lightweight-charts-rs"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
+authors = ["Lucas Manoguerra <developer.spoonacular.004@gmail.com>"]
+description = "A lightweight, high-performance financial charting library written in Rust using Relm4 and GTK4"
+license = "MIT"
+repository = "https://github.com/lucasmanoguerra/lightweight-charts-rs"
+homepage = "https://github.com/lucasmanoguerra/lightweight-charts-rs"
+documentation = "https://docs.rs/lightweight-charts-rs"
+readme = "README.md"
+keywords = ["chart", "financial", "trading", "candlestick", "technical-analysis"]
+categories = ["gui", "visualization", "financial"]
+rust-version = "1.70"
 
 [dependencies]
 relm4 = { version = "0.10", default-features = true }

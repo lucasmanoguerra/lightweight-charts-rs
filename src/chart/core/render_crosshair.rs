@@ -1,9 +1,5 @@
 use cairo::{Context, FontSlant, FontWeight};
 
-use super::ChartCore;
-use super::render_helpers::{
-    build_ticks_for_scale, primary_candle_side, tooltip_position,
-};
 use super::super::data::{SeriesData, SeriesScale};
 use super::super::format::{
     format_price_with_format, format_series_tooltip, format_time_label, format_tooltip,
@@ -17,6 +13,8 @@ use super::super::util::{
     apply_line_style, candle_time, map_price_to_y_scaled, map_time_to_x, map_y_to_price_scaled,
     nearest_by_time, transform_price,
 };
+use super::render_helpers::{build_ticks_for_scale, primary_candle_side, tooltip_position};
+use super::ChartCore;
 use crate::icons::{draw_svg_icon, IconName};
 
 impl ChartCore {
@@ -98,7 +96,8 @@ impl ChartCore {
                 if snap_to_ohlc {
                     if let Some(candles) = primary_candles {
                         if let Some(candle) = nearest_by_time(candles, target_time) {
-                            let candle_side = primary_candle_side(self.primary_candles, &self.series);
+                            let candle_side =
+                                primary_candle_side(self.primary_candles, &self.series);
                             if candle_side == Some(side) {
                                 let values = [candle.open, candle.high, candle.low, candle.close];
                                 for value in values {
@@ -149,7 +148,13 @@ impl ChartCore {
                 }
 
                 if let Some(time) = snapped_time {
-                    x = map_time_to_x(time, start_time, end_time, layout.plot_left, layout.plot_width);
+                    x = map_time_to_x(
+                        time,
+                        start_time,
+                        end_time,
+                        layout.plot_left,
+                        layout.plot_width,
+                    );
                 }
                 if let Some(price) = snapped_price {
                     y = map_price_to_y_scaled(
@@ -175,7 +180,13 @@ impl ChartCore {
                     snapped_price = Some(point.value);
                 }
                 if let Some(time) = snapped_time {
-                    x = map_time_to_x(time, start_time, end_time, layout.plot_left, layout.plot_width);
+                    x = map_time_to_x(
+                        time,
+                        start_time,
+                        end_time,
+                        layout.plot_left,
+                        layout.plot_width,
+                    );
                 }
                 if let Some(price) = snapped_price {
                     y = map_price_to_y_scaled(
@@ -264,12 +275,8 @@ impl ChartCore {
                         scale.mode,
                         scale.base,
                     );
-                    let ticks = build_ticks_for_scale(
-                        scale,
-                        layout.plot_top,
-                        layout.main_height,
-                        options,
-                    );
+                    let ticks =
+                        build_ticks_for_scale(scale, layout.plot_top, layout.main_height, options);
                     tooltip_precision = ticks.precision;
                     let label_value = if matches!(
                         scale.mode,
@@ -446,8 +453,14 @@ impl ChartCore {
                     &self.options.right_price_scale,
                 )
             });
-            let rsi_ticks = if let (Some(scale), Some(panel)) = (rsi_scale, self.rsi_panel.as_ref()) {
-                Some(build_ticks_for_scale(scale, layout.rsi_top, layout.rsi_height, &panel.options))
+            let rsi_ticks = if let (Some(scale), Some(panel)) = (rsi_scale, self.rsi_panel.as_ref())
+            {
+                Some(build_ticks_for_scale(
+                    scale,
+                    layout.rsi_top,
+                    layout.rsi_height,
+                    &panel.options,
+                ))
             } else {
                 None
             };
@@ -485,7 +498,11 @@ impl ChartCore {
                         } else {
                             point.value
                         };
-                        let label = if panel.title.is_empty() { "RSI" } else { &panel.title };
+                        let label = if panel.title.is_empty() {
+                            "RSI"
+                        } else {
+                            &panel.title
+                        };
                         lines.push(format_series_tooltip(
                             &self.options.tooltip_line_format,
                             label,
@@ -509,13 +526,21 @@ impl ChartCore {
                                 PriceScale::Left => left_scale
                                     .map(|scale| (left_ticks.as_ref(), scale))
                                     .map(|(ticks, scale)| {
-                                        (ticks.map(|t| t.precision).unwrap_or(2), scale.mode, scale.base)
+                                        (
+                                            ticks.map(|t| t.precision).unwrap_or(2),
+                                            scale.mode,
+                                            scale.base,
+                                        )
                                     })
                                     .unwrap_or((2, PriceScaleMode::Normal, 1.0)),
                                 PriceScale::Right => right_scale
                                     .map(|scale| (right_ticks.as_ref(), scale))
                                     .map(|(ticks, scale)| {
-                                        (ticks.map(|t| t.precision).unwrap_or(2), scale.mode, scale.base)
+                                        (
+                                            ticks.map(|t| t.precision).unwrap_or(2),
+                                            scale.mode,
+                                            scale.base,
+                                        )
                                     })
                                     .unwrap_or((2, PriceScaleMode::Normal, 1.0)),
                             };
@@ -560,7 +585,12 @@ impl ChartCore {
                                 .unwrap_or_default();
                             (ticks.precision, scale.mode, scale.base, format)
                         } else {
-                            (tooltip_precision, PriceScaleMode::Normal, 1.0, PriceFormat::default())
+                            (
+                                tooltip_precision,
+                                PriceScaleMode::Normal,
+                                1.0,
+                                PriceFormat::default(),
+                            )
                         };
                         let display_candle = if matches!(
                             mode,
@@ -598,13 +628,21 @@ impl ChartCore {
                                     PriceScale::Left => left_scale
                                         .map(|scale| (left_ticks.as_ref(), scale))
                                         .map(|(ticks, scale)| {
-                                            (ticks.map(|t| t.precision).unwrap_or(2), scale.mode, scale.base)
+                                            (
+                                                ticks.map(|t| t.precision).unwrap_or(2),
+                                                scale.mode,
+                                                scale.base,
+                                            )
                                         })
                                         .unwrap_or((2, PriceScaleMode::Normal, 1.0)),
                                     PriceScale::Right => right_scale
                                         .map(|scale| (right_ticks.as_ref(), scale))
                                         .map(|(ticks, scale)| {
-                                            (ticks.map(|t| t.precision).unwrap_or(2), scale.mode, scale.base)
+                                            (
+                                                ticks.map(|t| t.precision).unwrap_or(2),
+                                                scale.mode,
+                                                scale.base,
+                                            )
                                         })
                                         .unwrap_or((2, PriceScaleMode::Normal, 1.0)),
                                 };
@@ -635,13 +673,21 @@ impl ChartCore {
                                     PriceScale::Left => left_scale
                                         .map(|scale| (left_ticks.as_ref(), scale))
                                         .map(|(ticks, scale)| {
-                                            (ticks.map(|t| t.precision).unwrap_or(2), scale.mode, scale.base)
+                                            (
+                                                ticks.map(|t| t.precision).unwrap_or(2),
+                                                scale.mode,
+                                                scale.base,
+                                            )
                                         })
                                         .unwrap_or((2, PriceScaleMode::Normal, 1.0)),
                                     PriceScale::Right => right_scale
                                         .map(|scale| (right_ticks.as_ref(), scale))
                                         .map(|(ticks, scale)| {
-                                            (ticks.map(|t| t.precision).unwrap_or(2), scale.mode, scale.base)
+                                            (
+                                                ticks.map(|t| t.precision).unwrap_or(2),
+                                                scale.mode,
+                                                scale.base,
+                                            )
                                         })
                                         .unwrap_or((2, PriceScaleMode::Normal, 1.0)),
                                 };

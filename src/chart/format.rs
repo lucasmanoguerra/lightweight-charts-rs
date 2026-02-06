@@ -19,84 +19,84 @@ pub(crate) fn format_time_label(
         format_time_custom(tick_mark_format, dt)
     } else {
         match mode {
-        TimeLabelMode::Time => {
-            let t = dt.time();
-            if seconds_visible {
-                format!("{:02}:{:02}:{:02}", t.hour(), t.minute(), t.second())
-            } else {
-                format!("{:02}:{:02}", t.hour(), t.minute())
+            TimeLabelMode::Time => {
+                let t = dt.time();
+                if seconds_visible {
+                    format!("{:02}:{:02}:{:02}", t.hour(), t.minute(), t.second())
+                } else {
+                    format!("{:02}:{:02}", t.hour(), t.minute())
+                }
             }
-        }
-        TimeLabelMode::Date => {
-            let d = dt.date();
-            format!("{:04}-{:02}-{:02}", d.year(), u8::from(d.month()), d.day())
-        }
-        TimeLabelMode::DateTime => {
-            let d = dt.date();
-            let t = dt.time();
-            if seconds_visible {
-                format!(
-                    "{:04}-{:02}-{:02} {:02}:{:02}:{:02}",
-                    d.year(),
-                    u8::from(d.month()),
-                    d.day(),
-                    t.hour(),
-                    t.minute(),
-                    t.second()
-                )
-            } else {
-                format!(
-                    "{:04}-{:02}-{:02} {:02}:{:02}",
-                    d.year(),
-                    u8::from(d.month()),
-                    d.day(),
-                    t.hour(),
-                    t.minute()
-                )
+            TimeLabelMode::Date => {
+                let d = dt.date();
+                format!("{:04}-{:02}-{:02}", d.year(), u8::from(d.month()), d.day())
             }
-        }
-        TimeLabelMode::Custom => {
-            if custom.trim().is_empty() {
-                format_time_label(
-                    time,
-                    step,
-                    TimeLabelMode::Auto,
-                    custom,
-                    time_visible,
-                    seconds_visible,
-                    tick_mark_format,
-                    tick_mark_max_len,
-                )
-            } else {
-                format_time_custom(custom, dt)
+            TimeLabelMode::DateTime => {
+                let d = dt.date();
+                let t = dt.time();
+                if seconds_visible {
+                    format!(
+                        "{:04}-{:02}-{:02} {:02}:{:02}:{:02}",
+                        d.year(),
+                        u8::from(d.month()),
+                        d.day(),
+                        t.hour(),
+                        t.minute(),
+                        t.second()
+                    )
+                } else {
+                    format!(
+                        "{:04}-{:02}-{:02} {:02}:{:02}",
+                        d.year(),
+                        u8::from(d.month()),
+                        d.day(),
+                        t.hour(),
+                        t.minute()
+                    )
+                }
             }
-        }
-        TimeLabelMode::Auto => {
-            if !time_visible {
-                if step < 30 * 24 * 60 * 60 {
+            TimeLabelMode::Custom => {
+                if custom.trim().is_empty() {
+                    format_time_label(
+                        time,
+                        step,
+                        TimeLabelMode::Auto,
+                        custom,
+                        time_visible,
+                        seconds_visible,
+                        tick_mark_format,
+                        tick_mark_max_len,
+                    )
+                } else {
+                    format_time_custom(custom, dt)
+                }
+            }
+            TimeLabelMode::Auto => {
+                if !time_visible {
+                    if step < 30 * 24 * 60 * 60 {
+                        let d = dt.date();
+                        format!("{:02}-{:02}", u8::from(d.month()), d.day())
+                    } else if step < 365 * 24 * 60 * 60 {
+                        let d = dt.date();
+                        format!("{:04}-{:02}", d.year(), u8::from(d.month()))
+                    } else {
+                        format!("{:04}", dt.date().year())
+                    }
+                } else if step < 60 && seconds_visible {
+                    let t = dt.time();
+                    format!("{:02}:{:02}:{:02}", t.hour(), t.minute(), t.second())
+                } else if step < 24 * 60 * 60 {
+                    let t = dt.time();
+                    format!("{:02}:{:02}", t.hour(), t.minute())
+                } else if step < 30 * 24 * 60 * 60 {
                     let d = dt.date();
                     format!("{:02}-{:02}", u8::from(d.month()), d.day())
-                } else if step < 365 * 24 * 60 * 60 {
+                } else {
                     let d = dt.date();
                     format!("{:04}-{:02}", d.year(), u8::from(d.month()))
-                } else {
-                    format!("{:04}", dt.date().year())
                 }
-            } else if step < 60 && seconds_visible {
-                let t = dt.time();
-                format!("{:02}:{:02}:{:02}", t.hour(), t.minute(), t.second())
-            } else if step < 24 * 60 * 60 {
-                let t = dt.time();
-                format!("{:02}:{:02}", t.hour(), t.minute())
-            } else if step < 30 * 24 * 60 * 60 {
-                let d = dt.date();
-                format!("{:02}-{:02}", u8::from(d.month()), d.day())
-            } else {
-                let d = dt.date();
-                format!("{:04}-{:02}", d.year(), u8::from(d.month()))
             }
         }
-    }
     };
 
     if tick_mark_max_len > 0 && label.len() > tick_mark_max_len {
@@ -192,7 +192,10 @@ pub(crate) fn format_series_tooltip(
     let mut text = template.to_string();
     text = text.replace("{series}", series);
     text = text.replace("{time}", &format_datetime(time));
-    text = text.replace("{value}", &format_price_with_format(value, format, precision, mode));
+    text = text.replace(
+        "{value}",
+        &format_price_with_format(value, format, precision, mode),
+    );
     text
 }
 

@@ -1,9 +1,5 @@
 use cairo::Context;
 
-use super::ChartCore;
-use super::render_helpers::{
-    aligned_price_ticks, build_ticks_for_scale, primary_candle_scale, primary_candles,
-};
 use super::super::data::SeriesData;
 use super::super::layout::ChartLayout;
 use super::super::ticks::build_time_ticks;
@@ -12,6 +8,10 @@ use super::super::util::{
     candle_time, histogram_range, map_price_to_y, map_price_to_y_scaled, map_time_to_x,
     series_bar_width_times, visible_candles, visible_histogram_points, visible_line_points,
 };
+use super::render_helpers::{
+    aligned_price_ticks, build_ticks_for_scale, primary_candle_scale, primary_candles,
+};
+use super::ChartCore;
 
 impl ChartCore {
     pub(crate) fn draw(&mut self, cr: &Context, width: f64, height: f64) {
@@ -101,9 +101,7 @@ impl ChartCore {
                     }
 
                     let body_width = series_bar_width_times(
-                        visible
-                            .iter()
-                            .map(|candle| candle_time(candle.time)),
+                        visible.iter().map(|candle| candle_time(candle.time)),
                         start_time,
                         end_time,
                         layout.plot_width,
@@ -164,7 +162,11 @@ impl ChartCore {
                         );
 
                         let up = candle.close >= candle.open;
-                        let wick = if up { self.style.wick_up } else { self.style.wick_down };
+                        let wick = if up {
+                            self.style.wick_up
+                        } else {
+                            self.style.wick_down
+                        };
                         let border = if up {
                             self.style.border_up
                         } else {
@@ -303,9 +305,7 @@ impl ChartCore {
                     }
 
                     let bar_width = series_bar_width_times(
-                        visible
-                            .iter()
-                            .map(|point| candle_time(point.time)),
+                        visible.iter().map(|point| candle_time(point.time)),
                         start_time,
                         end_time,
                         layout.plot_width,
@@ -418,9 +418,17 @@ impl ChartCore {
                     cr.line_to(layout.plot_right, layout.rsi_top);
                     let _ = cr.stroke();
 
-                    cr.select_font_face("Sans", cairo::FontSlant::Normal, cairo::FontWeight::Normal);
+                    cr.select_font_face(
+                        "Sans",
+                        cairo::FontSlant::Normal,
+                        cairo::FontWeight::Normal,
+                    );
                     cr.set_font_size(self.style.axis_font_size);
-                    let title = if panel.title.is_empty() { "RSI" } else { &panel.title };
+                    let title = if panel.title.is_empty() {
+                        "RSI"
+                    } else {
+                        &panel.title
+                    };
                     let title_y = layout.rsi_top + self.style.axis_font_size + 4.0;
                     cr.set_source_rgb(
                         self.style.axis_text.r,
@@ -499,9 +507,7 @@ impl ChartCore {
                     &self.options.left_price_scale,
                 ),
             };
-            if let (Some(primary_ticks), true) =
-                (primary_ticks, secondary_options.align_labels)
-            {
+            if let (Some(primary_ticks), true) = (primary_ticks, secondary_options.align_labels) {
                 *secondary_ticks = Some(aligned_price_ticks(
                     primary_ticks,
                     primary_scale,

@@ -1,13 +1,13 @@
-use super::ChartCore;
+use super::super::layout::ChartLayout;
 use super::super::options::{
     ChartStyle, HandleScaleOptions, HandleScrollOptions, InteractionSensitivityOptions,
     KineticScrollOptions, TrackingModeOptions,
 };
 use super::super::types::{
-    Color, CrosshairCenter, CrosshairMode, LineStyle, PanelControlAction, PanelControlHit,
-    PanelId, PanelRole, Rect, TimeLabelMode, TooltipPosition,
+    Color, CrosshairCenter, CrosshairMode, LineStyle, PanelControlAction, PanelControlHit, PanelId,
+    PanelRole, Rect, TimeLabelMode, TooltipPosition,
 };
-use super::super::layout::ChartLayout;
+use super::ChartCore;
 
 impl ChartCore {
     pub(crate) fn set_candle_colors(
@@ -172,20 +172,20 @@ impl ChartCore {
     }
 
     pub(crate) fn tooltip_icon_at(&self, x: f64, y: f64) -> Option<PanelId> {
-        self.tooltip_icon
-            .get()
-            .and_then(|(panel, rect)| if rect.contains(x, y) { Some(panel) } else { None })
+        self.tooltip_icon.get().and_then(|(panel, rect)| {
+            if rect.contains(x, y) {
+                Some(panel)
+            } else {
+                None
+            }
+        })
     }
 
     pub(crate) fn set_panel_controls(&self, hits: Vec<PanelControlHit>) {
         *self.panel_controls.borrow_mut() = hits;
     }
 
-    pub(crate) fn panel_control_at(
-        &self,
-        x: f64,
-        y: f64,
-    ) -> Option<(PanelId, PanelControlAction)> {
+    pub(crate) fn panel_control_at(&self, x: f64, y: f64) -> Option<(PanelId, PanelControlAction)> {
         for hit in self.panel_controls.borrow().iter() {
             if hit.rect.contains(x, y) {
                 return Some((hit.panel, hit.action));
@@ -194,13 +194,7 @@ impl ChartCore {
         None
     }
 
-    pub(crate) fn panel_at(
-        &self,
-        x: f64,
-        y: f64,
-        width: f64,
-        height: f64,
-    ) -> Option<PanelId> {
+    pub(crate) fn panel_at(&self, x: f64, y: f64, width: f64, height: f64) -> Option<PanelId> {
         let layout = ChartLayout::new(self, width, height);
         if layout.panels.is_empty() {
             return None;
@@ -208,7 +202,9 @@ impl ChartCore {
         layout
             .panels
             .iter()
-            .find(|panel| y >= panel.top && y <= panel.bottom && x >= panel.plot_left && x <= panel.plot_right)
+            .find(|panel| {
+                y >= panel.top && y <= panel.bottom && x >= panel.plot_left && x <= panel.plot_right
+            })
             .map(|panel| panel.id)
     }
 

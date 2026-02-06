@@ -1,14 +1,14 @@
 use cairo::{Context, FontSlant, FontWeight};
 
-use super::ChartCore;
-use super::render_helpers::build_ticks_for_scale;
+use super::super::data::SeriesScale;
 use super::super::format::{format_price_with_format, format_time_label};
 use super::super::layout::ChartLayout;
 use super::super::options::PriceScaleOptions;
 use super::super::ticks::{PriceTicks, TimeTicks};
 use super::super::types::{PriceFormat, PriceScale, PriceScaleMode};
 use super::super::util::{inverse_transform_price, map_price_to_y_scaled, map_time_to_x};
-use super::super::data::SeriesScale;
+use super::render_helpers::build_ticks_for_scale;
+use super::ChartCore;
 
 impl ChartCore {
     pub(super) fn draw_grid(
@@ -25,7 +25,12 @@ impl ChartCore {
             return;
         }
 
-        cr.set_source_rgba(self.style.grid.r, self.style.grid.g, self.style.grid.b, 0.35);
+        cr.set_source_rgba(
+            self.style.grid.r,
+            self.style.grid.g,
+            self.style.grid.b,
+            0.35,
+        );
         cr.set_line_width(1.0);
 
         for tick in &time_ticks.ticks {
@@ -47,13 +52,13 @@ impl ChartCore {
         };
         if let Some(scale) = primary_scale {
             let options = self.price_scale_options(primary_side);
-            let ticks = build_ticks_for_scale(
-                scale,
-                layout.plot_top,
-                layout.main_height,
-                options,
+            let ticks = build_ticks_for_scale(scale, layout.plot_top, layout.main_height, options);
+            cr.set_source_rgba(
+                self.style.grid.r,
+                self.style.grid.g,
+                self.style.grid.b,
+                0.35,
             );
-            cr.set_source_rgba(self.style.grid.r, self.style.grid.g, self.style.grid.b, 0.35);
             cr.set_line_width(1.0);
             for value in &ticks.ticks {
                 let raw_value = if scale.mode == PriceScaleMode::Logarithmic {
@@ -89,39 +94,40 @@ impl ChartCore {
             .unwrap_or(true);
         if rsi_visible {
             if let (Some(panel), Some(scale)) = (self.rsi_panel.as_ref(), rsi_scale) {
-                let ticks = build_ticks_for_scale(
-                    scale,
-                    layout.rsi_top,
-                    layout.rsi_height,
-                    &panel.options,
+                let ticks =
+                    build_ticks_for_scale(scale, layout.rsi_top, layout.rsi_height, &panel.options);
+                cr.set_source_rgba(
+                    self.style.grid.r,
+                    self.style.grid.g,
+                    self.style.grid.b,
+                    0.25,
                 );
-            cr.set_source_rgba(self.style.grid.r, self.style.grid.g, self.style.grid.b, 0.25);
-            cr.set_line_width(1.0);
-            for value in &ticks.ticks {
-                let raw_value = if scale.mode == PriceScaleMode::Logarithmic {
-                    inverse_transform_price(*value, scale.mode, scale.base)
-                } else if matches!(
-                    scale.mode,
-                    PriceScaleMode::Percentage | PriceScaleMode::IndexedTo100
-                ) {
-                    inverse_transform_price(*value, scale.mode, scale.base)
-                } else {
-                    *value
-                };
-                let y = map_price_to_y_scaled(
-                    raw_value,
-                    scale.min,
-                    scale.max,
-                    layout.rsi_top,
-                    layout.rsi_height,
-                    scale.margins,
-                    scale.invert,
-                    scale.mode,
-                    scale.base,
-                );
-                cr.move_to(layout.plot_left, y);
-                cr.line_to(layout.plot_right, y);
-            }
+                cr.set_line_width(1.0);
+                for value in &ticks.ticks {
+                    let raw_value = if scale.mode == PriceScaleMode::Logarithmic {
+                        inverse_transform_price(*value, scale.mode, scale.base)
+                    } else if matches!(
+                        scale.mode,
+                        PriceScaleMode::Percentage | PriceScaleMode::IndexedTo100
+                    ) {
+                        inverse_transform_price(*value, scale.mode, scale.base)
+                    } else {
+                        *value
+                    };
+                    let y = map_price_to_y_scaled(
+                        raw_value,
+                        scale.min,
+                        scale.max,
+                        layout.rsi_top,
+                        layout.rsi_height,
+                        scale.margins,
+                        scale.invert,
+                        scale.mode,
+                        scale.base,
+                    );
+                    cr.move_to(layout.plot_left, y);
+                    cr.line_to(layout.plot_right, y);
+                }
                 let _ = cr.stroke();
             }
         }
@@ -231,8 +237,10 @@ impl ChartCore {
         for value in &ticks.ticks {
             let raw_value = if scale.mode == PriceScaleMode::Logarithmic {
                 inverse_transform_price(*value, scale.mode, scale.base)
-            } else if matches!(scale.mode, PriceScaleMode::Percentage | PriceScaleMode::IndexedTo100)
-            {
+            } else if matches!(
+                scale.mode,
+                PriceScaleMode::Percentage | PriceScaleMode::IndexedTo100
+            ) {
                 inverse_transform_price(*value, scale.mode, scale.base)
             } else {
                 *value
@@ -251,13 +259,16 @@ impl ChartCore {
 
             let label_value = if matches!(scale.mode, PriceScaleMode::Logarithmic) {
                 raw_value
-            } else if matches!(scale.mode, PriceScaleMode::Percentage | PriceScaleMode::IndexedTo100)
-            {
+            } else if matches!(
+                scale.mode,
+                PriceScaleMode::Percentage | PriceScaleMode::IndexedTo100
+            ) {
                 *value
             } else {
                 raw_value
             };
-            let label = format_price_with_format(label_value, price_format, ticks.precision, scale.mode);
+            let label =
+                format_price_with_format(label_value, price_format, ticks.precision, scale.mode);
             let extents = match cr.text_extents(&label) {
                 Ok(extents) => extents,
                 Err(_) => continue,
@@ -272,13 +283,21 @@ impl ChartCore {
                 continue;
             }
 
-            cr.set_source_rgb(options.text_color.r, options.text_color.g, options.text_color.b);
+            cr.set_source_rgb(
+                options.text_color.r,
+                options.text_color.g,
+                options.text_color.b,
+            );
             cr.move_to(text_x, text_y);
             let _ = cr.show_text(&label);
 
             if options.ticks_visible {
                 let tick_len = 4.0;
-                cr.set_source_rgb(options.border_color.r, options.border_color.g, options.border_color.b);
+                cr.set_source_rgb(
+                    options.border_color.r,
+                    options.border_color.g,
+                    options.border_color.b,
+                );
                 cr.move_to(axis_right - tick_len, y);
                 cr.line_to(axis_right, y);
                 let _ = cr.stroke();
@@ -315,8 +334,10 @@ impl ChartCore {
         for value in &ticks.ticks {
             let raw_value = if scale.mode == PriceScaleMode::Logarithmic {
                 inverse_transform_price(*value, scale.mode, scale.base)
-            } else if matches!(scale.mode, PriceScaleMode::Percentage | PriceScaleMode::IndexedTo100)
-            {
+            } else if matches!(
+                scale.mode,
+                PriceScaleMode::Percentage | PriceScaleMode::IndexedTo100
+            ) {
                 inverse_transform_price(*value, scale.mode, scale.base)
             } else {
                 *value
@@ -335,13 +356,16 @@ impl ChartCore {
 
             let label_value = if matches!(scale.mode, PriceScaleMode::Logarithmic) {
                 raw_value
-            } else if matches!(scale.mode, PriceScaleMode::Percentage | PriceScaleMode::IndexedTo100)
-            {
+            } else if matches!(
+                scale.mode,
+                PriceScaleMode::Percentage | PriceScaleMode::IndexedTo100
+            ) {
                 *value
             } else {
                 raw_value
             };
-            let label = format_price_with_format(label_value, price_format, ticks.precision, scale.mode);
+            let label =
+                format_price_with_format(label_value, price_format, ticks.precision, scale.mode);
             let extents = match cr.text_extents(&label) {
                 Ok(extents) => extents,
                 Err(_) => continue,
@@ -356,13 +380,21 @@ impl ChartCore {
                 continue;
             }
 
-            cr.set_source_rgb(options.text_color.r, options.text_color.g, options.text_color.b);
+            cr.set_source_rgb(
+                options.text_color.r,
+                options.text_color.g,
+                options.text_color.b,
+            );
             cr.move_to(text_x, text_y);
             let _ = cr.show_text(&label);
 
             if options.ticks_visible {
                 let tick_len = 4.0;
-                cr.set_source_rgb(options.border_color.r, options.border_color.g, options.border_color.b);
+                cr.set_source_rgb(
+                    options.border_color.r,
+                    options.border_color.g,
+                    options.border_color.b,
+                );
                 cr.move_to(axis_right, y);
                 cr.line_to(axis_right + tick_len, y);
                 let _ = cr.stroke();

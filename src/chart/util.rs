@@ -1,9 +1,7 @@
 use cairo::Context;
 use time::OffsetDateTime;
 
-use super::types::{
-    Candle, HistogramPoint, LinePoint, LineStyle, PriceScaleMode, ScaleMargins,
-};
+use super::types::{Candle, HistogramPoint, LinePoint, LineStyle, PriceScaleMode, ScaleMargins};
 
 pub(crate) fn map_price_to_y(price: f64, min: f64, max: f64, top: f64, height: f64) -> f64 {
     let norm = (price - min) / (max - min);
@@ -248,10 +246,7 @@ pub(crate) fn apply_line_style(cr: &Context, style: LineStyle, line_width: f64) 
     }
 }
 
-pub(crate) fn nearest_by_time<T: super::data::HasTime>(
-    data: &[T],
-    target_time: f64,
-) -> Option<&T> {
+pub(crate) fn nearest_by_time<T: super::data::HasTime>(data: &[T], target_time: f64) -> Option<&T> {
     if data.is_empty() {
         return None;
     }

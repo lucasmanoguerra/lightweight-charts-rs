@@ -8,10 +8,8 @@ pub struct MacdSeries {
 }
 
 pub fn compute_macd(candles: &[Candle], fast: usize, slow: usize, signal: usize) -> MacdSeries {
-    let mut times: Vec<(time::OffsetDateTime, f64)> = candles
-        .iter()
-        .map(|c| (c.time, c.close))
-        .collect();
+    let mut times: Vec<(time::OffsetDateTime, f64)> =
+        candles.iter().map(|c| (c.time, c.close)).collect();
     if times.is_empty() {
         return MacdSeries {
             macd: Vec::new(),
@@ -32,7 +30,10 @@ pub fn compute_macd(candles: &[Candle], fast: usize, slow: usize, signal: usize)
 
     let macd_line: Vec<LinePoint> = macd_vals
         .iter()
-        .map(|(t, v)| LinePoint { time: *t, value: *v })
+        .map(|(t, v)| LinePoint {
+            time: *t,
+            value: *v,
+        })
         .collect();
     let signal_line = compute_ema_for_times(&macd_vals, signal);
 

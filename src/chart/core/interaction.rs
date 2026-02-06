@@ -1,6 +1,6 @@
-use super::ChartCore;
 use super::super::layout::ChartLayout;
 use super::super::types::{PanResult, PanelResizeHandle, PriceScale};
+use super::ChartCore;
 
 impl ChartCore {
     pub(crate) fn set_crosshair(&mut self, x: f64, y: f64) {

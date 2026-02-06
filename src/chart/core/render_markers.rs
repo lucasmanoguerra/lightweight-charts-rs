@@ -1,13 +1,11 @@
 use cairo::Context;
 
-use super::ChartCore;
-use super::render_helpers::draw_rounded_rect;
 use super::super::data::{HasTime, SeriesScale};
 use super::super::layout::ChartLayout;
 use super::super::types::{Color, Marker, MarkerPosition, MarkerShape, SeriesMarkersOptions};
-use super::super::util::{
-    candle_time, map_price_to_y_scaled, map_time_to_x, nearest_by_time,
-};
+use super::super::util::{candle_time, map_price_to_y_scaled, map_time_to_x, nearest_by_time};
+use super::render_helpers::draw_rounded_rect;
+use super::ChartCore;
 use crate::icons::draw_marker_svg_icon;
 
 impl ChartCore {
@@ -36,7 +34,13 @@ impl ChartCore {
                 continue;
             }
 
-            let x = map_time_to_x(time, start_time, end_time, layout.plot_left, layout.plot_width);
+            let x = map_time_to_x(
+                time,
+                start_time,
+                end_time,
+                layout.plot_left,
+                layout.plot_width,
+            );
             let mut y = layout.plot_top;
 
             let mut price_anchor = None;

@@ -26,6 +26,23 @@ pub use types::{
 
 use time::OffsetDateTime;
 
+/// Creates sample candlestick data for testing and demonstration purposes.
+///
+/// # Returns
+///
+/// A vector of 20 sample candlesticks covering the past 19 days with
+/// realistic price movements and trends.
+///
+/// # Examples
+///
+/// ```rust
+/// use lightweight_charts_rs::{create_chart, sample_candles};
+///
+/// let chart = create_chart();
+/// let series = chart.add_candlestick_series();
+/// let sample_data = sample_candles();
+/// series.set_data(sample_data);
+/// ```
 pub fn sample_candles() -> Vec<Candle> {
     let start = OffsetDateTime::now_utc() - time::Duration::days(19);
     let mut price = 100.0;

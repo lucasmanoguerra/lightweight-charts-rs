@@ -1,4 +1,3 @@
-use super::ChartCore;
 use super::super::data::{
     HasTime, IndicatorPanel, Panel, PanelSeries, PriceLine, PriceScaleState, Series, SeriesData,
     SeriesKind, SeriesOptions,
@@ -7,6 +6,7 @@ use super::super::types::{
     Candle, Color, HistogramPoint, LinePoint, LineStyle, Marker, PanelId, PanelRole, PriceFormat,
     PriceLineOptions, PriceScale, SeriesMarkersOptions, TimeScaleId,
 };
+use super::ChartCore;
 
 impl ChartCore {
     pub(crate) fn add_candlestick_series(&mut self) -> usize {
@@ -130,7 +130,9 @@ impl ChartCore {
     }
 
     pub(crate) fn rsi_auto_scale(&self) -> Option<bool> {
-        self.rsi_panel.as_ref().map(|panel| panel.options.auto_scale)
+        self.rsi_panel
+            .as_ref()
+            .map(|panel| panel.options.auto_scale)
     }
 
     pub(crate) fn rsi_price_scale_visible(&self) -> Option<bool> {
@@ -138,7 +140,10 @@ impl ChartCore {
     }
 
     fn main_panel_id(&self) -> PanelId {
-        self.panels.first().map(|panel| panel.id).unwrap_or(PanelId(1))
+        self.panels
+            .first()
+            .map(|panel| panel.id)
+            .unwrap_or(PanelId(1))
     }
 
     fn attach_series_to_panel(&mut self, panel_id: PanelId, series_id: usize, kind: SeriesKind) {
@@ -177,7 +182,11 @@ impl ChartCore {
             show_volume: false,
         };
         self.panels.push(panel);
-        if let Some(group) = self.time_scales.iter_mut().find(|group| group.id == group_id) {
+        if let Some(group) = self
+            .time_scales
+            .iter_mut()
+            .find(|group| group.id == group_id)
+        {
             group.panels.push(id);
         }
         id
@@ -232,10 +241,9 @@ impl ChartCore {
     }
 
     pub(crate) fn set_indicator_panel_data(&mut self, panel_id: PanelId, data: Vec<LinePoint>) {
-        let line_series_id = self
-            .series
-            .iter()
-            .position(|series| series.panel_id == panel_id && matches!(series.kind, SeriesKind::Line));
+        let line_series_id = self.series.iter().position(|series| {
+            series.panel_id == panel_id && matches!(series.kind, SeriesKind::Line)
+        });
         let series_id = match line_series_id {
             Some(id) => id,
             None => {
@@ -375,15 +383,27 @@ impl ChartCore {
         if let Some(series) = self.series.get_mut(id) {
             let line_id = series.next_price_line_id;
             series.next_price_line_id += 1;
-            series.price_lines.push(PriceLine { id: line_id, options });
+            series.price_lines.push(PriceLine {
+                id: line_id,
+                options,
+            });
             return line_id;
         }
         0
     }
 
-    pub(crate) fn update_price_line(&mut self, id: usize, line_id: usize, options: PriceLineOptions) {
+    pub(crate) fn update_price_line(
+        &mut self,
+        id: usize,
+        line_id: usize,
+        options: PriceLineOptions,
+    ) {
         if let Some(series) = self.series.get_mut(id) {
-            if let Some(line) = series.price_lines.iter_mut().find(|line| line.id == line_id) {
+            if let Some(line) = series
+                .price_lines
+                .iter_mut()
+                .find(|line| line.id == line_id)
+            {
                 line.options = options;
             }
         }
@@ -391,7 +411,11 @@ impl ChartCore {
 
     pub(crate) fn set_price_line_price(&mut self, id: usize, line_id: usize, price: f64) {
         if let Some(series) = self.series.get_mut(id) {
-            if let Some(line) = series.price_lines.iter_mut().find(|line| line.id == line_id) {
+            if let Some(line) = series
+                .price_lines
+                .iter_mut()
+                .find(|line| line.id == line_id)
+            {
                 line.options.price = price;
             }
         }

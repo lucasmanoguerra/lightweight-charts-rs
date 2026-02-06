@@ -26,11 +26,8 @@ pub fn compute_bollinger(candles: &[Candle], period: usize, mult: f64) -> Bollin
         }
         if window.len() == period {
             let mean = window.iter().sum::<f64>() / period as f64;
-            let variance = window
-                .iter()
-                .map(|v| (v - mean) * (v - mean))
-                .sum::<f64>()
-                / period as f64;
+            let variance =
+                window.iter().map(|v| (v - mean) * (v - mean)).sum::<f64>() / period as f64;
             let std = variance.sqrt();
             let up = mean + std * mult;
             let down = mean - std * mult;
@@ -49,5 +46,9 @@ pub fn compute_bollinger(candles: &[Candle], period: usize, mult: f64) -> Bollin
         }
     }
 
-    BollingerBands { middle, upper, lower }
+    BollingerBands {
+        middle,
+        upper,
+        lower,
+    }
 }

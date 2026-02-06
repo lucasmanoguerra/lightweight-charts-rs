@@ -3,12 +3,21 @@ use super::types::{
     TooltipPosition,
 };
 
+/// Configuration options for chart tooltips.
+///
+/// Tooltips display information about data points when the user
+/// hovers over the chart.
 #[derive(Clone, Debug)]
 pub struct TooltipOptions {
+    /// Whether tooltips are enabled
     pub enabled: bool,
+    /// Where tooltips are positioned on the chart
     pub position: TooltipPosition,
+    /// Background color of tooltips
     pub background: Color,
+    /// Text color of tooltips
     pub text: Color,
+    /// Format string for tooltip content (supports placeholders like {time}, {open}, {high}, {low}, {close})
     pub format: String,
 }
 
@@ -187,11 +196,19 @@ impl Default for TrackingModeOptions {
     }
 }
 
+/// Configuration options for interaction sensitivity.
+///
+/// These settings control how sensitive the chart is to various
+/// user interactions like dragging and zooming.
 #[derive(Clone, Copy, Debug)]
 pub struct InteractionSensitivityOptions {
+    /// Sensitivity for time axis dragging
     pub axis_drag_time: f64,
+    /// Sensitivity for price axis dragging
     pub axis_drag_price: f64,
+    /// Sensitivity for mouse wheel zooming
     pub wheel_zoom: f64,
+    /// Sensitivity for pinch zooming
     pub pinch_zoom: f64,
 }
 
@@ -243,27 +260,51 @@ impl Default for PriceScaleOptions {
     }
 }
 
+/// Defines the visual style and colors used throughout the chart.
+///
+/// This structure contains all the color definitions and sizing
+/// parameters that control the appearance of the chart.
 #[derive(Clone, Copy, Debug)]
 pub struct ChartStyle {
+    /// Background color of the chart
     pub background: Color,
+    /// Color of the grid lines
     pub grid: Color,
+    /// Color for upward (bullish) candlesticks
     pub up: Color,
+    /// Color for downward (bearish) candlesticks
     pub down: Color,
+    /// Border color for upward candlesticks
     pub border_up: Color,
+    /// Border color for downward candlesticks
     pub border_down: Color,
+    /// Wick color for upward candlesticks
     pub wick_up: Color,
+    /// Wick color for downward candlesticks
     pub wick_down: Color,
+    /// Default color for line series
     pub line: Color,
+    /// Default color for histogram series
     pub histogram: Color,
+    /// Color for axis text and labels
     pub axis_text: Color,
+    /// Color for the crosshair
     pub crosshair: Color,
+    /// Padding around the chart in pixels
     pub padding: f64,
+    /// Height of the time axis in pixels
     pub axis_height: f64,
+    /// Font size for axis text in pixels
     pub axis_font_size: f64,
+    /// Width of the price axis in pixels
     pub price_axis_width: f64,
+    /// Height ratio for histogram panels (0.0 to 1.0)
     pub histogram_height_ratio: f64,
+    /// Height ratio for RSI panels (0.0 to 1.0)
     pub rsi_height_ratio: f64,
+    /// Height of panel toolbars in pixels
     pub panel_toolbar_height: f64,
+    /// Size of panel toolbar icons in pixels
     pub panel_toolbar_icon_size: f64,
 }
 

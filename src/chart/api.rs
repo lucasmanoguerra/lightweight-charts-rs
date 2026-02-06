@@ -12,30 +12,50 @@ use super::types::{
 use std::cell::RefCell;
 use std::rc::Rc;
 
+/// Main chart API that provides access to all chart functionality.
+///
+/// This is the primary interface for creating and manipulating financial charts.
+/// It manages the underlying chart core and provides methods for adding series,
+/// handling interactions, and configuring chart appearance.
 #[derive(Clone, Debug)]
 pub struct ChartApi {
     inner: Rc<RefCell<ChartCore>>,
 }
 
-
+/// API for managing candlestick (OHLC) series on a chart.
+///
+/// Provides methods for setting candlestick data, updating individual candles,
+/// and configuring series-specific options like price lines and markers.
 #[derive(Clone, Debug)]
 pub struct CandlestickSeriesApi {
     inner: Rc<RefCell<ChartCore>>,
     id: usize,
 }
 
+/// API for managing line series on a chart.
+///
+/// Provides methods for setting line data, updating individual points,
+/// and configuring series-specific options like price lines and markers.
 #[derive(Clone, Debug)]
 pub struct LineSeriesApi {
     inner: Rc<RefCell<ChartCore>>,
     id: usize,
 }
 
+/// API for managing histogram series on a chart.
+///
+/// Provides methods for setting histogram data, updating individual bars,
+/// and configuring series-specific options like price lines and markers.
 #[derive(Clone, Debug)]
 pub struct HistogramSeriesApi {
     inner: Rc<RefCell<ChartCore>>,
     id: usize,
 }
 
+/// API for managing price lines on a series.
+///
+/// Price lines are horizontal lines that can be added to any series
+/// to mark specific price levels with optional labels and styling.
 #[derive(Clone, Debug)]
 pub struct PriceLineApi {
     inner: Rc<RefCell<ChartCore>>,
@@ -43,6 +63,20 @@ pub struct PriceLineApi {
     line_id: usize,
 }
 
+/// Creates a new chart instance.
+///
+/// # Returns
+///
+/// A new `ChartApi` instance ready for configuration and use.
+///
+/// # Examples
+///
+/// ```rust
+/// use lightweight_charts_rs::create_chart;
+///
+/// let chart = create_chart();
+/// let candlestick_series = chart.add_candlestick_series();
+/// ```
 pub fn create_chart() -> ChartApi {
     ChartApi {
         inner: Rc::new(RefCell::new(ChartCore::new())),
@@ -50,6 +84,20 @@ pub fn create_chart() -> ChartApi {
 }
 
 impl ChartApi {
+    /// Adds a new candlestick series to the chart.
+    ///
+    /// # Returns
+    ///
+    /// A `CandlestickSeriesApi` instance for managing the new series.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use lightweight_charts_rs::create_chart;
+    ///
+    /// let chart = create_chart();
+    /// let series = chart.add_candlestick_series();
+    /// ```
     pub fn add_candlestick_series(&self) -> CandlestickSeriesApi {
         let id = self.inner.borrow_mut().add_candlestick_series();
         CandlestickSeriesApi {
@@ -58,6 +106,20 @@ impl ChartApi {
         }
     }
 
+    /// Adds a new line series to the chart.
+    ///
+    /// # Returns
+    ///
+    /// A `LineSeriesApi` instance for managing the new series.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use lightweight_charts_rs::create_chart;
+    ///
+    /// let chart = create_chart();
+    /// let series = chart.add_line_series();
+    /// ```
     pub fn add_line_series(&self) -> LineSeriesApi {
         let id = self.inner.borrow_mut().add_line_series();
         LineSeriesApi {
@@ -66,6 +128,20 @@ impl ChartApi {
         }
     }
 
+    /// Adds a new histogram series to the chart.
+    ///
+    /// # Returns
+    ///
+    /// A `HistogramSeriesApi` instance for managing the new series.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use lightweight_charts_rs::create_chart;
+    ///
+    /// let chart = create_chart();
+    /// let series = chart.add_histogram_series();
+    /// ```
     pub fn add_histogram_series(&self) -> HistogramSeriesApi {
         let id = self.inner.borrow_mut().add_histogram_series();
         HistogramSeriesApi {
@@ -74,74 +150,219 @@ impl ChartApi {
         }
     }
 
+    /// Sets up an RSI (Relative Strength Index) panel with the given title and data.
+    ///
+    /// # Arguments
+    ///
+    /// * `title` - The title to display for the RSI panel
+    /// * `data` - A vector of line points representing the RSI values
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use lightweight_charts_rs::{create_chart, LinePoint};
+    ///
+    /// let chart = create_chart();
+    /// let rsi_data = vec![
+    ///     LinePoint { time: time::OffsetDateTime::now_utc(), value: 70.0 },
+    ///     LinePoint { time: time::OffsetDateTime::now_utc(), value: 30.0 },
+    /// ];
+    /// chart.set_rsi_panel("RSI".to_string(), rsi_data);
+    /// ```
     pub fn set_rsi_panel(&self, title: String, data: Vec<LinePoint>) {
         self.inner.borrow_mut().set_rsi_panel(title, data);
     }
 
+    /// Updates the data for the existing RSI panel.
+    ///
+    /// # Arguments
+    ///
+    /// * `data` - A vector of line points representing the new RSI values
+    ///
+    /// # Panics
+    ///
+    /// Panics if no RSI panel has been created yet.
     pub fn set_rsi_panel_data(&self, data: Vec<LinePoint>) {
         self.inner.borrow_mut().set_rsi_panel_data(data);
     }
 
+    /// Clears and removes the RSI panel from the chart.
     pub fn clear_rsi_panel(&self) {
         self.inner.borrow_mut().clear_rsi_panel();
     }
 
+    /// Checks whether an RSI panel is currently present on the chart.
+    ///
+    /// # Returns
+    ///
+    /// `true` if an RSI panel exists, `false` otherwise.
     pub fn has_rsi_panel(&self) -> bool {
         self.inner.borrow().has_rsi_panel()
     }
 
+    /// Gets the current color of the RSI panel line.
+    ///
+    /// # Returns
+    ///
+    /// The current color if an RSI panel exists, `None` otherwise.
     pub fn rsi_color(&self) -> Option<Color> {
         self.inner.borrow().rsi_color()
     }
 
+    /// Sets the color of the RSI panel line.
+    ///
+    /// # Arguments
+    ///
+    /// * `color` - The color to use for the RSI line
+    ///
+    /// # Panics
+    ///
+    /// Panics if no RSI panel has been created yet.
     pub fn set_rsi_color(&self, color: Color) {
         self.inner.borrow_mut().set_rsi_color(color);
     }
 
+    /// Sets whether the RSI panel should use auto-scaling.
+    ///
+    /// # Arguments
+    ///
+    /// * `enabled` - `true` to enable auto-scaling, `false` to disable
+    ///
+    /// # Panics
+    ///
+    /// Panics if no RSI panel has been created yet.
     pub fn set_rsi_auto_scale(&self, enabled: bool) {
         self.inner.borrow_mut().set_rsi_auto_scale(enabled);
     }
 
+    /// Sets whether the price scale for the RSI panel should be visible.
+    ///
+    /// # Arguments
+    ///
+    /// * `visible` - `true` to show the price scale, `false` to hide it
+    ///
+    /// # Panics
+    ///
+    /// Panics if no RSI panel has been created yet.
     pub fn set_rsi_price_scale_visible(&self, visible: bool) {
         self.inner.borrow_mut().set_rsi_price_scale_visible(visible);
     }
 
+    /// Gets the current auto-scaling setting for the RSI panel.
+    ///
+    /// # Returns
+    ///
+    /// The auto-scaling setting if an RSI panel exists, `None` otherwise.
     pub fn rsi_auto_scale(&self) -> Option<bool> {
         self.inner.borrow().rsi_auto_scale()
     }
 
+    /// Gets the current visibility setting for the RSI panel price scale.
+    ///
+    /// # Returns
+    ///
+    /// The price scale visibility if an RSI panel exists, `None` otherwise.
     pub fn rsi_price_scale_visible(&self) -> Option<bool> {
         self.inner.borrow().rsi_price_scale_visible()
     }
 
+    /// Renders the chart to the given Cairo context.
+    ///
+    /// # Arguments
+    ///
+    /// * `cr` - The Cairo context to draw on
+    /// * `width` - The width of the drawing area
+    /// * `height` - The height of the drawing area
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use lightweight_charts_rs::create_chart;
+    ///
+    /// let chart = create_chart();
+    /// // Setup chart data and series...
+    ///
+    /// let surface = cairo::ImageSurface::create(cairo::Format::ARgb32, 800, 600).unwrap();
+    /// let cr = cairo::Context::new(&surface).unwrap();
+    /// chart.draw(&cr, 800.0, 600.0);
+    /// ```
     pub fn draw(&self, cr: &cairo::Context, width: f64, height: f64) {
         self.inner.borrow_mut().draw(cr, width, height);
     }
 
+    /// Gets the currently visible time range on the chart.
+    ///
+    /// # Returns
+    ///
+    /// A tuple containing the start and end timestamps of the visible range.
     pub fn visible_time_range(&self) -> (f64, f64) {
         self.inner.borrow().visible_time_range()
     }
 
+    /// Gets the current chart style configuration.
+    ///
+    /// # Returns
+    ///
+    /// The current `ChartStyle` containing colors, sizes, and other visual settings.
     pub fn style(&self) -> ChartStyle {
         self.inner.borrow().style()
     }
 
+    /// Gets the panel ID of the tooltip icon at the given coordinates.
+    ///
+    /// # Arguments
+    ///
+    /// * `x` - The x coordinate to check
+    /// * `y` - The y coordinate to check
+    ///
+    /// # Returns
+    ///
+    /// The panel ID if a tooltip icon is at the position, `None` otherwise.
     pub fn tooltip_icon_at(&self, x: f64, y: f64) -> Option<PanelId> {
         self.inner.borrow().tooltip_icon_at(x, y)
     }
 
+    /// Gets the panel ID at the given coordinates.
+    ///
+    /// # Arguments
+    ///
+    /// * `x` - The x coordinate to check
+    /// * `y` - The y coordinate to check
+    /// * `width` - The total width of the chart
+    /// * `height` - The total height of the chart
+    ///
+    /// # Returns
+    ///
+    /// The panel ID if a panel is at the position, `None` otherwise.
     pub fn panel_at(&self, x: f64, y: f64, width: f64, height: f64) -> Option<PanelId> {
         self.inner.borrow().panel_at(x, y, width, height)
     }
 
-    pub fn panel_control_at(
-        &self,
-        x: f64,
-        y: f64,
-    ) -> Option<(PanelId, PanelControlAction)> {
+    /// Gets the panel control action at the given coordinates.
+    ///
+    /// # Arguments
+    ///
+    /// * `x` - The x coordinate to check
+    /// * `y` - The y coordinate to check
+    ///
+    /// # Returns
+    ///
+    /// A tuple containing the panel ID and control action if a control is at the position, `None` otherwise.
+    pub fn panel_control_at(&self, x: f64, y: f64) -> Option<(PanelId, PanelControlAction)> {
         self.inner.borrow().panel_control_at(x, y)
     }
 
+    /// Gets the panel resize handle at the given coordinates.
+    ///
+    /// # Arguments
+    ///
+    /// * `y` - The y coordinate to check
+    /// * `width` - The total width of the chart
+    /// * `height` - The total height of the chart
+    ///
+    /// # Returns
+    ///
+    /// The resize handle information if a handle is at the position, `None` otherwise.
     pub fn panel_resize_handle_at(
         &self,
         y: f64,
@@ -188,7 +409,9 @@ impl ChartApi {
     }
 
     pub fn set_panel_line_color(&self, panel_id: PanelId, color: Color) {
-        self.inner.borrow_mut().set_panel_line_color(panel_id, color);
+        self.inner
+            .borrow_mut()
+            .set_panel_line_color(panel_id, color);
     }
 
     pub fn panel_auto_scale(&self, panel_id: PanelId) -> Option<bool> {
@@ -196,7 +419,9 @@ impl ChartApi {
     }
 
     pub fn set_panel_auto_scale(&self, panel_id: PanelId, enabled: bool) {
-        self.inner.borrow_mut().set_panel_auto_scale(panel_id, enabled);
+        self.inner
+            .borrow_mut()
+            .set_panel_auto_scale(panel_id, enabled);
     }
 
     pub fn panel_price_scale_visible(&self, panel_id: PanelId) -> Option<bool> {
@@ -209,6 +434,20 @@ impl ChartApi {
             .set_panel_price_scale_visible(panel_id, visible);
     }
 
+    /// Pans the chart by the specified pixel amounts.
+    ///
+    /// # Arguments
+    ///
+    /// * `dx` - The horizontal pan amount in pixels
+    /// * `dy` - The vertical pan amount in pixels  
+    /// * `width` - The total width of the chart
+    /// * `height` - The total height of the chart
+    /// * `x` - The x coordinate of the pan origin
+    /// * `y` - The y coordinate of the pan origin
+    ///
+    /// # Returns
+    ///
+    /// A `PanResult` indicating what was panned (time axis, price axis, or both).
     pub fn pan_by_pixels(
         &self,
         dx: f64,
@@ -250,14 +489,7 @@ impl ChartApi {
             .zoom_by_delta(delta, x, y, width, height)
     }
 
-    pub fn zoom_by_delta_pinch(
-        &self,
-        delta: f64,
-        x: f64,
-        y: f64,
-        width: f64,
-        height: f64,
-    ) {
+    pub fn zoom_by_delta_pinch(&self, delta: f64, x: f64, y: f64, width: f64, height: f64) {
         self.inner
             .borrow_mut()
             .zoom_by_delta_pinch(delta, x, y, width, height);
@@ -286,9 +518,14 @@ impl ChartApi {
         wick_up: Color,
         wick_down: Color,
     ) {
-        self.inner
-            .borrow_mut()
-            .set_candle_colors(up, down, border_up, border_down, wick_up, wick_down);
+        self.inner.borrow_mut().set_candle_colors(
+            up,
+            down,
+            border_up,
+            border_down,
+            wick_up,
+            wick_down,
+        );
     }
 
     pub fn set_background_color(&self, color: Color) {
@@ -324,9 +561,7 @@ impl ChartApi {
     }
 
     pub fn set_tooltip_colors(&self, background: Color, text: Color) {
-        self.inner
-            .borrow_mut()
-            .set_tooltip_colors(background, text);
+        self.inner.borrow_mut().set_tooltip_colors(background, text);
     }
 
     pub fn set_tooltip_position(&self, position: TooltipPosition) {
@@ -342,9 +577,7 @@ impl ChartApi {
     }
 
     pub fn set_tooltip_histogram_format(&self, format: String) {
-        self.inner
-            .borrow_mut()
-            .set_tooltip_histogram_format(format);
+        self.inner.borrow_mut().set_tooltip_histogram_format(format);
     }
 
     pub fn set_crosshair_visibility(&self, vertical: bool, horizontal: bool) {
@@ -398,27 +631,39 @@ impl ChartApi {
     }
 
     pub fn set_crosshair_snap_to_series(&self, enabled: bool) {
-        self.inner.borrow_mut().set_crosshair_snap_to_series(enabled);
+        self.inner
+            .borrow_mut()
+            .set_crosshair_snap_to_series(enabled);
     }
 
     pub fn set_time_scale_min_bar_spacing(&self, value: f64) {
-        self.inner.borrow_mut().set_time_scale_min_bar_spacing(value);
+        self.inner
+            .borrow_mut()
+            .set_time_scale_min_bar_spacing(value);
     }
 
     pub fn set_time_scale_max_bar_spacing(&self, value: f64) {
-        self.inner.borrow_mut().set_time_scale_max_bar_spacing(value);
+        self.inner
+            .borrow_mut()
+            .set_time_scale_max_bar_spacing(value);
     }
 
     pub fn set_time_scale_fix_left_edge(&self, enabled: bool) {
-        self.inner.borrow_mut().set_time_scale_fix_left_edge(enabled);
+        self.inner
+            .borrow_mut()
+            .set_time_scale_fix_left_edge(enabled);
     }
 
     pub fn set_time_scale_fix_right_edge(&self, enabled: bool) {
-        self.inner.borrow_mut().set_time_scale_fix_right_edge(enabled);
+        self.inner
+            .borrow_mut()
+            .set_time_scale_fix_right_edge(enabled);
     }
 
     pub fn set_time_scale_right_offset_pixels(&self, pixels: f64) {
-        self.inner.borrow_mut().set_time_scale_right_offset_pixels(pixels);
+        self.inner
+            .borrow_mut()
+            .set_time_scale_right_offset_pixels(pixels);
     }
 
     pub fn set_time_scale_visible(&self, visible: bool) {
@@ -426,11 +671,15 @@ impl ChartApi {
     }
 
     pub fn set_time_scale_border(&self, visible: bool, color: Color) {
-        self.inner.borrow_mut().set_time_scale_border(visible, color);
+        self.inner
+            .borrow_mut()
+            .set_time_scale_border(visible, color);
     }
 
     pub fn set_time_scale_ticks_visible(&self, visible: bool) {
-        self.inner.borrow_mut().set_time_scale_ticks_visible(visible);
+        self.inner
+            .borrow_mut()
+            .set_time_scale_ticks_visible(visible);
     }
 
     pub fn set_time_scale_time_visible(&self, visible: bool) {
@@ -438,15 +687,21 @@ impl ChartApi {
     }
 
     pub fn set_time_scale_seconds_visible(&self, visible: bool) {
-        self.inner.borrow_mut().set_time_scale_seconds_visible(visible);
+        self.inner
+            .borrow_mut()
+            .set_time_scale_seconds_visible(visible);
     }
 
     pub fn set_time_scale_tick_mark_format(&self, format: String) {
-        self.inner.borrow_mut().set_time_scale_tick_mark_format(format);
+        self.inner
+            .borrow_mut()
+            .set_time_scale_tick_mark_format(format);
     }
 
     pub fn set_time_scale_tick_mark_max_len(&self, len: usize) {
-        self.inner.borrow_mut().set_time_scale_tick_mark_max_len(len);
+        self.inner
+            .borrow_mut()
+            .set_time_scale_tick_mark_max_len(len);
     }
 
     pub fn set_time_scale_lock_visible_time_range_on_resize(&self, enabled: bool) {
@@ -468,7 +723,9 @@ impl ChartApi {
     }
 
     pub fn set_time_scale_minimum_height(&self, height: f64) {
-        self.inner.borrow_mut().set_time_scale_minimum_height(height);
+        self.inner
+            .borrow_mut()
+            .set_time_scale_minimum_height(height);
     }
 
     pub fn set_time_scale_uniform_distribution(&self, enabled: bool) {
@@ -526,7 +783,9 @@ impl ChartApi {
     }
 
     pub fn set_price_scale_options(&self, side: PriceScale, options: PriceScaleOptions) {
-        self.inner.borrow_mut().set_price_scale_options(side, options);
+        self.inner
+            .borrow_mut()
+            .set_price_scale_options(side, options);
     }
 
     pub fn set_price_scale_mode(&self, side: PriceScale, mode: PriceScaleMode) {
@@ -534,15 +793,21 @@ impl ChartApi {
     }
 
     pub fn set_price_scale_auto_scale(&self, side: PriceScale, enabled: bool) {
-        self.inner.borrow_mut().set_price_scale_auto_scale(side, enabled);
+        self.inner
+            .borrow_mut()
+            .set_price_scale_auto_scale(side, enabled);
     }
 
     pub fn set_price_scale_visible(&self, side: PriceScale, visible: bool) {
-        self.inner.borrow_mut().set_price_scale_visible(side, visible);
+        self.inner
+            .borrow_mut()
+            .set_price_scale_visible(side, visible);
     }
 
     pub fn set_price_scale_margins(&self, side: PriceScale, margins: ScaleMargins) {
-        self.inner.borrow_mut().set_price_scale_margins(side, margins);
+        self.inner
+            .borrow_mut()
+            .set_price_scale_margins(side, margins);
     }
 
     pub fn set_price_scale_border(&self, side: PriceScale, visible: bool, color: Color) {
@@ -552,15 +817,21 @@ impl ChartApi {
     }
 
     pub fn set_price_scale_text_color(&self, side: PriceScale, color: Color) {
-        self.inner.borrow_mut().set_price_scale_text_color(side, color);
+        self.inner
+            .borrow_mut()
+            .set_price_scale_text_color(side, color);
     }
 
     pub fn set_price_scale_ticks_visible(&self, side: PriceScale, visible: bool) {
-        self.inner.borrow_mut().set_price_scale_ticks_visible(side, visible);
+        self.inner
+            .borrow_mut()
+            .set_price_scale_ticks_visible(side, visible);
     }
 
     pub fn set_price_scale_minimum_width(&self, side: PriceScale, width: f64) {
-        self.inner.borrow_mut().set_price_scale_minimum_width(side, width);
+        self.inner
+            .borrow_mut()
+            .set_price_scale_minimum_width(side, width);
     }
 
     pub fn set_price_scale_invert(&self, side: PriceScale, invert: bool) {
@@ -568,7 +839,9 @@ impl ChartApi {
     }
 
     pub fn set_price_scale_align_labels(&self, side: PriceScale, align: bool) {
-        self.inner.borrow_mut().set_price_scale_align_labels(side, align);
+        self.inner
+            .borrow_mut()
+            .set_price_scale_align_labels(side, align);
     }
 
     pub fn set_price_scale_entire_text_only(&self, side: PriceScale, enabled: bool) {
@@ -589,10 +862,52 @@ impl ChartApi {
 }
 
 impl CandlestickSeriesApi {
+    /// Sets the candlestick data for this series.
+    ///
+    /// This replaces all existing data in the series.
+    ///
+    /// # Arguments
+    ///
+    /// * `candles` - A vector of candle data points
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use lightweight_charts_rs::{create_chart, Candle};
+    ///
+    /// let chart = create_chart();
+    /// let series = chart.add_candlestick_series();
+    ///
+    /// let candles = vec![
+    ///     Candle {
+    ///         time: time::OffsetDateTime::now_utc(),
+    ///         open: 100.0,
+    ///         high: 105.0,
+    ///         low: 95.0,
+    ///         close: 102.0,
+    ///     },
+    /// ];
+    /// series.set_data(candles);
+    /// ```
     pub fn set_data(&self, candles: Vec<Candle>) {
         self.inner.borrow_mut().set_candles(self.id, candles);
     }
 
+    /// Sets the candlestick data from a vector of Bar data.
+    ///
+    /// This is a convenience method that converts Bar data to Candle data.
+    ///
+    /// # Arguments
+    ///
+    /// * `bars` - A vector of bar data points to convert and set
+    ///
+    /// # Returns
+    ///
+    /// `Ok(())` if successful, `Err(BarConversionError)` if conversion fails
+    ///
+    /// # Errors
+    ///
+    /// Returns `BarConversionError::NonFinite` if any bar contains non-finite values.
     pub fn set_data_from_bars(&self, bars: Vec<Bar>) -> Result<(), BarConversionError> {
         let mut candles = Vec::with_capacity(bars.len());
         for bar in &bars {
@@ -602,36 +917,80 @@ impl CandlestickSeriesApi {
         Ok(())
     }
 
+    /// Updates the last candle in the series or adds a new candle.
+    ///
+    /// If the candle time matches the last candle, it will be updated.
+    /// Otherwise, a new candle will be added.
+    ///
+    /// # Arguments
+    ///
+    /// * `candle` - The candle data to update or add
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use lightweight_charts_rs::{create_chart, Candle};
+    ///
+    /// let chart = create_chart();
+    /// let series = chart.add_candlestick_series();
+    ///
+    /// // Update the most recent candle
+    /// let new_candle = Candle {
+    ///     time: time::OffsetDateTime::now_utc(),
+    ///     open: 102.0,
+    ///     high: 106.0,
+    ///     low: 98.0,
+    ///     close: 104.0,
+    /// };
+    /// series.update(new_candle);
+    /// ```
     pub fn update(&self, candle: Candle) {
         self.inner.borrow_mut().update_candle(self.id, candle);
     }
 
+    /// Sets which price scale (left or right) this series should use.
+    ///
+    /// # Arguments
+    ///
+    /// * `scale` - The price scale to use (`PriceScale::Left` or `PriceScale::Right`)
     pub fn set_price_scale(&self, scale: PriceScale) {
         self.inner.borrow_mut().set_series_scale(self.id, scale);
     }
 
     pub fn set_price_line_visible(&self, visible: bool) {
-        self.inner.borrow_mut().set_series_price_line(self.id, visible);
+        self.inner
+            .borrow_mut()
+            .set_series_price_line(self.id, visible);
     }
 
     pub fn set_price_line_style(&self, style: LineStyle) {
-        self.inner.borrow_mut().set_series_price_line_style(self.id, style);
+        self.inner
+            .borrow_mut()
+            .set_series_price_line_style(self.id, style);
     }
 
     pub fn set_price_line_width(&self, width: f64) {
-        self.inner.borrow_mut().set_series_price_line_width(self.id, width);
+        self.inner
+            .borrow_mut()
+            .set_series_price_line_width(self.id, width);
     }
 
     pub fn set_price_line_color(&self, color: Color) {
-        self.inner.borrow_mut().set_series_price_line_color(self.id, color);
+        self.inner
+            .borrow_mut()
+            .set_series_price_line_color(self.id, color);
     }
 
     pub fn set_last_value_visible(&self, visible: bool) {
-        self.inner.borrow_mut().set_series_last_value(self.id, visible);
+        self.inner
+            .borrow_mut()
+            .set_series_last_value(self.id, visible);
     }
 
     pub fn set_last_value_color(&self, color: Color) {
-        self.inner.borrow_mut().set_series_last_value_color(self.id, color);
+        self.inner
+            .borrow_mut()
+            .set_series_last_value_color(self.id, color);
     }
 
     pub fn set_last_value_text_color(&self, color: Color) {
@@ -651,14 +1010,38 @@ impl CandlestickSeriesApi {
     }
 
     pub fn set_price_format(&self, format: PriceFormat) {
-        self.inner.borrow_mut().set_series_price_format(self.id, format);
+        self.inner
+            .borrow_mut()
+            .set_series_price_format(self.id, format);
     }
 
+    /// Creates a new price line on this series.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - Configuration options for the price line
+    ///
+    /// # Returns
+    ///
+    /// A `PriceLineApi` instance for managing the new price line.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use lightweight_charts_rs::{create_chart, PriceLineOptions, Color};
+    ///
+    /// let chart = create_chart();
+    /// let series = chart.add_candlestick_series();
+    ///
+    /// let line_options = PriceLineOptions {
+    ///     price: 100.0,
+    ///     color: Color::new(1.0, 0.0, 0.0),
+    ///     ..Default::default()
+    /// };
+    /// let price_line = series.create_price_line(line_options);
+    /// ```
     pub fn create_price_line(&self, options: PriceLineOptions) -> PriceLineApi {
-        let line_id = self
-            .inner
-            .borrow_mut()
-            .create_price_line(self.id, options);
+        let line_id = self.inner.borrow_mut().create_price_line(self.id, options);
         PriceLineApi {
             inner: self.inner.clone(),
             series_id: self.id,
@@ -681,19 +1064,27 @@ impl LineSeriesApi {
     }
 
     pub fn set_price_line_visible(&self, visible: bool) {
-        self.inner.borrow_mut().set_series_price_line(self.id, visible);
+        self.inner
+            .borrow_mut()
+            .set_series_price_line(self.id, visible);
     }
 
     pub fn set_price_line_style(&self, style: LineStyle) {
-        self.inner.borrow_mut().set_series_price_line_style(self.id, style);
+        self.inner
+            .borrow_mut()
+            .set_series_price_line_style(self.id, style);
     }
 
     pub fn set_price_line_width(&self, width: f64) {
-        self.inner.borrow_mut().set_series_price_line_width(self.id, width);
+        self.inner
+            .borrow_mut()
+            .set_series_price_line_width(self.id, width);
     }
 
     pub fn set_price_line_color(&self, color: Color) {
-        self.inner.borrow_mut().set_series_price_line_color(self.id, color);
+        self.inner
+            .borrow_mut()
+            .set_series_price_line_color(self.id, color);
     }
 
     pub fn set_markers(&self, markers: Vec<Marker>) {
@@ -707,15 +1098,21 @@ impl LineSeriesApi {
     }
 
     pub fn set_price_format(&self, format: PriceFormat) {
-        self.inner.borrow_mut().set_series_price_format(self.id, format);
+        self.inner
+            .borrow_mut()
+            .set_series_price_format(self.id, format);
     }
 
     pub fn set_last_value_visible(&self, visible: bool) {
-        self.inner.borrow_mut().set_series_last_value(self.id, visible);
+        self.inner
+            .borrow_mut()
+            .set_series_last_value(self.id, visible);
     }
 
     pub fn set_last_value_color(&self, color: Color) {
-        self.inner.borrow_mut().set_series_last_value_color(self.id, color);
+        self.inner
+            .borrow_mut()
+            .set_series_last_value_color(self.id, color);
     }
 
     pub fn set_last_value_text_color(&self, color: Color) {
@@ -725,10 +1122,7 @@ impl LineSeriesApi {
     }
 
     pub fn create_price_line(&self, options: PriceLineOptions) -> PriceLineApi {
-        let line_id = self
-            .inner
-            .borrow_mut()
-            .create_price_line(self.id, options);
+        let line_id = self.inner.borrow_mut().create_price_line(self.id, options);
         PriceLineApi {
             inner: self.inner.clone(),
             series_id: self.id,
@@ -755,19 +1149,27 @@ impl HistogramSeriesApi {
     }
 
     pub fn set_price_line_visible(&self, visible: bool) {
-        self.inner.borrow_mut().set_series_price_line(self.id, visible);
+        self.inner
+            .borrow_mut()
+            .set_series_price_line(self.id, visible);
     }
 
     pub fn set_price_line_style(&self, style: LineStyle) {
-        self.inner.borrow_mut().set_series_price_line_style(self.id, style);
+        self.inner
+            .borrow_mut()
+            .set_series_price_line_style(self.id, style);
     }
 
     pub fn set_price_line_width(&self, width: f64) {
-        self.inner.borrow_mut().set_series_price_line_width(self.id, width);
+        self.inner
+            .borrow_mut()
+            .set_series_price_line_width(self.id, width);
     }
 
     pub fn set_price_line_color(&self, color: Color) {
-        self.inner.borrow_mut().set_series_price_line_color(self.id, color);
+        self.inner
+            .borrow_mut()
+            .set_series_price_line_color(self.id, color);
     }
 
     pub fn set_markers(&self, markers: Vec<Marker>) {
@@ -781,15 +1183,21 @@ impl HistogramSeriesApi {
     }
 
     pub fn set_price_format(&self, format: PriceFormat) {
-        self.inner.borrow_mut().set_series_price_format(self.id, format);
+        self.inner
+            .borrow_mut()
+            .set_series_price_format(self.id, format);
     }
 
     pub fn set_last_value_visible(&self, visible: bool) {
-        self.inner.borrow_mut().set_series_last_value(self.id, visible);
+        self.inner
+            .borrow_mut()
+            .set_series_last_value(self.id, visible);
     }
 
     pub fn set_last_value_color(&self, color: Color) {
-        self.inner.borrow_mut().set_series_last_value_color(self.id, color);
+        self.inner
+            .borrow_mut()
+            .set_series_last_value_color(self.id, color);
     }
 
     pub fn set_last_value_text_color(&self, color: Color) {
@@ -799,10 +1207,7 @@ impl HistogramSeriesApi {
     }
 
     pub fn create_price_line(&self, options: PriceLineOptions) -> PriceLineApi {
-        let line_id = self
-            .inner
-            .borrow_mut()
-            .create_price_line(self.id, options);
+        let line_id = self.inner.borrow_mut().create_price_line(self.id, options);
         PriceLineApi {
             inner: self.inner.clone(),
             series_id: self.id,
@@ -812,18 +1217,34 @@ impl HistogramSeriesApi {
 }
 
 impl PriceLineApi {
+    /// Applies new options to this price line.
+    ///
+    /// This updates all configurable aspects of the price line.
+    ///
+    /// # Arguments
+    ///
+    /// * `options` - The new options to apply
     pub fn apply_options(&self, options: PriceLineOptions) {
         self.inner
             .borrow_mut()
             .update_price_line(self.series_id, self.line_id, options);
     }
 
+    /// Updates the price level of this price line.
+    ///
+    /// # Arguments
+    ///
+    /// * `price` - The new price level for the line
     pub fn set_price(&self, price: f64) {
         self.inner
             .borrow_mut()
             .set_price_line_price(self.series_id, self.line_id, price);
     }
 
+    /// Removes this price line from the chart.
+    ///
+    /// After calling this method, the price line will no longer be visible
+    /// and the PriceLineApi instance should be discarded.
     pub fn remove(&self) {
         self.inner
             .borrow_mut()

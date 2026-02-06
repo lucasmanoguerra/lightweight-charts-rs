@@ -1,6 +1,6 @@
-use super::ChartCore;
 use super::super::options::PriceScaleOptions;
 use super::super::types::{Color, PriceScale, PriceScaleMode, ScaleMargins};
+use super::ChartCore;
 
 impl ChartCore {
     pub(crate) fn reset_autoscale(&mut self, side: PriceScale) {
@@ -107,7 +107,9 @@ impl ChartCore {
                 self.options.left_price_scale.ensure_edge_tick_marks_visible = enabled
             }
             PriceScale::Right => {
-                self.options.right_price_scale.ensure_edge_tick_marks_visible = enabled
+                self.options
+                    .right_price_scale
+                    .ensure_edge_tick_marks_visible = enabled
             }
         }
     }

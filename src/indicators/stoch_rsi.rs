@@ -14,7 +14,10 @@ pub fn compute_stoch_rsi(
 ) -> StochRsiSeries {
     let rsi_points = compute_rsi(candles, rsi_period);
     if k_period == 0 || rsi_points.is_empty() {
-        return StochRsiSeries { k: Vec::new(), d: Vec::new() };
+        return StochRsiSeries {
+            k: Vec::new(),
+            d: Vec::new(),
+        };
     }
 
     let mut k_values: Vec<(time::OffsetDateTime, f64)> = Vec::new();
@@ -35,7 +38,10 @@ pub fn compute_stoch_rsi(
 
     let k_line: Vec<LinePoint> = k_values
         .iter()
-        .map(|(t, v)| LinePoint { time: *t, value: *v })
+        .map(|(t, v)| LinePoint {
+            time: *t,
+            value: *v,
+        })
         .collect();
 
     let mut d_line = Vec::new();
@@ -48,10 +54,16 @@ pub fn compute_stoch_rsi(
             }
             if window.len() == d_period {
                 let avg = window.iter().sum::<f64>() / d_period as f64;
-                d_line.push(LinePoint { time: *time, value: avg });
+                d_line.push(LinePoint {
+                    time: *time,
+                    value: avg,
+                });
             }
         }
     }
 
-    StochRsiSeries { k: k_line, d: d_line }
+    StochRsiSeries {
+        k: k_line,
+        d: d_line,
+    }
 }

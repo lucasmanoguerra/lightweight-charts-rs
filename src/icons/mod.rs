@@ -35,28 +35,34 @@ fn marker_svg_source(text: &str) -> Option<&'static str> {
     match text.trim() {
         // Basic shapes
         "●" | "circle" | "Circle" => Some(include_str!("../../assets/icons/markers/circle.svg")),
-        "○" | "circle-outline" | "Circle Outline" => {
-            Some(include_str!("../../assets/icons/markers/circle-outline.svg"))
-        }
+        "○" | "circle-outline" | "Circle Outline" => Some(include_str!(
+            "../../assets/icons/markers/circle-outline.svg"
+        )),
         "■" | "square" | "Square" => Some(include_str!("../../assets/icons/markers/square.svg")),
-        "□" | "square-outline" | "Square Outline" => {
-            Some(include_str!("../../assets/icons/markers/square-outline.svg"))
-        }
+        "□" | "square-outline" | "Square Outline" => Some(include_str!(
+            "../../assets/icons/markers/square-outline.svg"
+        )),
         "▲" | "triangle-up" | "Triangle Up" => {
             Some(include_str!("../../assets/icons/markers/triangle-up.svg"))
         }
         "▼" | "triangle-down" | "Triangle Down" => {
             Some(include_str!("../../assets/icons/markers/triangle-down.svg"))
         }
-        "◆" | "diamond" | "Diamond" => Some(include_str!("../../assets/icons/markers/diamond.svg")),
-        "◇" | "diamond-outline" | "Diamond Outline" => {
-            Some(include_str!("../../assets/icons/markers/diamond-outline.svg"))
+        "◆" | "diamond" | "Diamond" => {
+            Some(include_str!("../../assets/icons/markers/diamond.svg"))
         }
+        "◇" | "diamond-outline" | "Diamond Outline" => Some(include_str!(
+            "../../assets/icons/markers/diamond-outline.svg"
+        )),
         // Signals
         "✓" | "check" | "Check" => Some(include_str!("../../assets/icons/markers/check.svg")),
         "✕" | "x" | "X" => Some(include_str!("../../assets/icons/markers/x.svg")),
-        "★" | "☆" | "star" | "Star" => Some(include_str!("../../assets/icons/markers/star.svg")),
-        "⚑" | "⚐" | "flag" | "Flag" => Some(include_str!("../../assets/icons/markers/flag.svg")),
+        "★" | "☆" | "star" | "Star" => {
+            Some(include_str!("../../assets/icons/markers/star.svg"))
+        }
+        "⚑" | "⚐" | "flag" | "Flag" => {
+            Some(include_str!("../../assets/icons/markers/flag.svg"))
+        }
         // Alerts (mapped to warning icon)
         "⚡" | "⚠" | "❗" | "❓" | "⛔" | "warning" | "Warning" => {
             Some(include_str!("../../assets/icons/markers/warning.svg"))
@@ -98,14 +104,7 @@ fn fontdb() -> &'static usvg::fontdb::Database {
     })
 }
 
-fn draw_svg_source(
-    cr: &Context,
-    svg_source: &str,
-    x: f64,
-    y: f64,
-    size: f64,
-    color: Color,
-) {
+fn draw_svg_source(cr: &Context, svg_source: &str, x: f64, y: f64, size: f64, color: Color) {
     if size <= 1.0 {
         return;
     }
@@ -160,14 +159,7 @@ fn draw_svg_source(
     let _ = cr.restore();
 }
 
-pub fn draw_svg_icon(
-    cr: &Context,
-    icon: IconName,
-    x: f64,
-    y: f64,
-    size: f64,
-    color: Color,
-) {
+pub fn draw_svg_icon(cr: &Context, icon: IconName, x: f64, y: f64, size: f64, color: Color) {
     draw_svg_source(cr, svg_source(icon), x, y, size, color);
 }
 

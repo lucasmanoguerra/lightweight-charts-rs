@@ -1,7 +1,5 @@
 use cairo::{Context, FontSlant, FontWeight};
 
-use super::ChartCore;
-use super::render_helpers::{build_ticks_for_scale, draw_rounded_rect, series_last_value};
 use super::super::data::SeriesScale;
 use super::super::format::format_price_with_format;
 use super::super::layout::ChartLayout;
@@ -10,6 +8,8 @@ use super::super::types::{
     Rect,
 };
 use super::super::util::{apply_line_style, map_price_to_y_scaled, transform_price};
+use super::render_helpers::{build_ticks_for_scale, draw_rounded_rect, series_last_value};
+use super::ChartCore;
 use crate::icons::{draw_svg_icon, IconName};
 use std::collections::HashMap;
 
@@ -159,8 +159,9 @@ impl ChartCore {
                         };
 
                         let bg = options.axis_label_color.unwrap_or(color);
-                        let text_color =
-                            options.axis_label_text_color.unwrap_or(Color::new(0.95, 0.96, 0.98));
+                        let text_color = options
+                            .axis_label_text_color
+                            .unwrap_or(Color::new(0.95, 0.96, 0.98));
                         cr.set_source_rgba(
                             bg.r,
                             bg.g,
@@ -222,7 +223,11 @@ impl ChartCore {
                 let alpha = 0.35;
                 cr.set_source_rgba(line_color.r, line_color.g, line_color.b, alpha);
                 cr.set_line_width(series.options.price_line_width.max(0.5));
-                apply_line_style(cr, series.options.price_line_style, series.options.price_line_width);
+                apply_line_style(
+                    cr,
+                    series.options.price_line_style,
+                    series.options.price_line_width,
+                );
                 cr.move_to(layout.plot_left, y);
                 cr.line_to(layout.plot_right, y);
                 let _ = cr.stroke();
@@ -365,7 +370,8 @@ impl ChartCore {
                 + (controls.len().saturating_sub(1)) as f64 * spacing;
             let start_y = (panel_layout.top + (panel_layout.height - total_height) / 2.0)
                 .max(panel_layout.top + 4.0);
-            let x = (panel_layout.axis_right - toolbar_width - 4.0).max(panel_layout.plot_right + 4.0);
+            let x =
+                (panel_layout.axis_right - toolbar_width - 4.0).max(panel_layout.plot_right + 4.0);
 
             let bg_color = Color::new(0.1, 0.12, 0.16);
             cr.set_source_rgba(bg_color.r, bg_color.g, bg_color.b, 0.65);

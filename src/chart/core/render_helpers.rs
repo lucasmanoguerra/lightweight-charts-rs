@@ -1,5 +1,6 @@
 use super::super::data::{Series, SeriesData, SeriesScale};
 use super::super::layout::ChartLayout;
+use super::super::options::ChartStyle;
 use super::super::options::PriceScaleOptions;
 use super::super::ticks::{build_price_ticks, PriceTicks};
 use super::super::types::{Candle, Color, PriceScale, TooltipPosition};
@@ -7,7 +8,6 @@ use super::super::util::{
     inverse_transform_price, map_price_to_y_scaled, map_y_to_price_scaled, scale_area,
     transform_price,
 };
-use super::super::options::ChartStyle;
 use cairo::Context;
 
 pub(super) fn primary_candles(primary: Option<usize>, series: &[Series]) -> Option<&[Candle]> {
@@ -28,10 +28,7 @@ pub(super) fn primary_candles(primary: Option<usize>, series: &[Series]) -> Opti
     None
 }
 
-pub(super) fn primary_candle_side(
-    primary: Option<usize>,
-    series: &[Series],
-) -> Option<PriceScale> {
+pub(super) fn primary_candle_side(primary: Option<usize>, series: &[Series]) -> Option<PriceScale> {
     if let Some(id) = primary {
         if let Some(series) = series.get(id) {
             return Some(series.scale);
@@ -49,7 +46,11 @@ pub(super) fn build_ticks_for_scale(
     let (_scale_top, scale_height) = scale_area(plot_top, plot_height, scale.margins);
     let t_min = transform_price(scale.min, scale.mode, scale.base);
     let t_max = transform_price(scale.max, scale.mode, scale.base);
-    let (t_min, t_max) = if t_min <= t_max { (t_min, t_max) } else { (t_max, t_min) };
+    let (t_min, t_max) = if t_min <= t_max {
+        (t_min, t_max)
+    } else {
+        (t_max, t_min)
+    };
     let mut ticks = build_price_ticks(t_min, t_max, scale_height);
     if options.ensure_edge_tick_marks_visible {
         ensure_edge_ticks(&mut ticks, t_min, t_max);
@@ -204,7 +205,19 @@ pub(super) fn draw_rounded_rect(
     cr.new_sub_path();
     cr.arc(x1 - r, y0 + r, r, -std::f64::consts::FRAC_PI_2, 0.0);
     cr.arc(x1 - r, y1 - r, r, 0.0, std::f64::consts::FRAC_PI_2);
-    cr.arc(x0 + r, y1 - r, r, std::f64::consts::FRAC_PI_2, std::f64::consts::PI);
-    cr.arc(x0 + r, y0 + r, r, std::f64::consts::PI, std::f64::consts::PI * 1.5);
+    cr.arc(
+        x0 + r,
+        y1 - r,
+        r,
+        std::f64::consts::FRAC_PI_2,
+        std::f64::consts::PI,
+    );
+    cr.arc(
+        x0 + r,
+        y0 + r,
+        r,
+        std::f64::consts::PI,
+        std::f64::consts::PI * 1.5,
+    );
     cr.close_path();
 }
