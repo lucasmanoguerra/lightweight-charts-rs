@@ -246,8 +246,8 @@ impl SimpleComponent for AppModel {
             ]);
         }
 
-        chart.set_main_header(symbol.clone(), interval.clone());
-        chart.set_rsi_panel("RSI".to_string(), rsi.clone());
+        chart.set_main_header_str(&symbol, &interval);
+        chart.set_rsi_panel_with_title("RSI", rsi.clone());
 
         let model = AppModel;
         let widgets = view_output!();
@@ -359,7 +359,7 @@ impl SimpleComponent for AppModel {
                             IndicatorKind::Rsi => {
                                 if enabled {
                                     let data = store.borrow().rsi.clone();
-                                    chart.set_rsi_panel("RSI".to_string(), data);
+                                    chart.set_rsi_panel_with_title("RSI", data);
                                     indicator_state
                                         .borrow_mut()
                                         .entry(panel_id)
@@ -424,7 +424,7 @@ impl SimpleComponent for AppModel {
                                     chart.style(),
                                 );
                                 hist_series.set_data(volumes);
-                                chart.set_rsi_panel_data(store_ref.rsi.clone());
+                                chart.try_set_rsi_panel_data(store_ref.rsi.clone());
                             }
                             lazy_loader.borrow_mut().finish_success(loaded_any);
                             drawing_area.queue_draw();
@@ -443,7 +443,7 @@ impl SimpleComponent for AppModel {
                                 volume.color = None;
                             }
                             hist_series.update(volume);
-                            chart.set_rsi_panel_data(store_ref.rsi.clone());
+                            chart.try_set_rsi_panel_data(store_ref.rsi.clone());
                             drawing_area.queue_draw();
                         }
                         DataEvent::LoadFailed(err) => {
@@ -532,7 +532,7 @@ impl SimpleComponent for AppModel {
                                     IndicatorKind::Rsi => {
                                         if enabled {
                                             let data = store.borrow().rsi.clone();
-                                            chart.set_rsi_panel("RSI".to_string(), data);
+                                            chart.set_rsi_panel_with_title("RSI", data);
                                             indicator_state
                                                 .borrow_mut()
                                                 .entry(panel_id)
