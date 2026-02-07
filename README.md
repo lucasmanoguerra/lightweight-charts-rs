@@ -1,16 +1,17 @@
 # Lightweight Charts RS
 
-A lightweight, high-performance financial charting library written in Rust using Relm4 and GTK4. This library provides interactive financial charts with support for various technical indicators and real-time data visualization. The project is desktop-only (Linux, Windows, macOS). It does not target web or mobile platforms; the only network-facing pieces are optional REST and WebSocket data sources.
+A lightweight, high-performance financial charting library written in Rust using Relm4 and GTK4. This project is desktop-only (Linux, Windows, macOS). It does not target web or mobile platforms; the only network-facing pieces are optional REST and WebSocket data sources.
 
-## Features
+## What It Offers Today
 
-- **Interactive Charts**: Candlestick, line, and histogram chart types
-- **Technical Indicators**: Built-in support for RSI, MACD, Bollinger Bands, SMA, EMA, Stochastic, and StochRSI
-- **Data Sources**: Optional REST and WebSocket support for market data
-- **Customizable**: Extensive styling and configuration options
-- **Desktop Platforms**: Linux, Windows, and macOS (no web or mobile targets)
-- **High Performance**: Built with Rust for optimal performance
-- **Lightweight**: Minimal dependencies and fast rendering
+- **Interactive charts**: Candlestick, line, and histogram series.
+- **Indicators**: RSI, MACD, Bollinger Bands, SMA, EMA, Stochastic, StochRSI.
+- **Multi-panel layout**: Main chart + stacked indicator panels.
+- **Overlays**: Price lines and markers.
+- **Crosshair and tooltips**: Configurable behavior and formatting.
+- **Configurable styling**: Colors, grids, scales, and interaction options.
+- **Desktop app**: GTK4 UI with settings panel and live data plumbing.
+- **Data sources**: Optional REST and WebSocket feeds.
 
 ## Screenshots
 
@@ -37,25 +38,44 @@ lightweight-charts-rs = "0.1.0"
 
 ## Usage
 
-### Basic Chart Example
+### Basic Chart Example (GTK4 DrawingArea)
 
 ```rust
-use lightweight_charts_rs::{create_chart, CandlestickSeriesApi, ChartStyle};
+use lightweight_charts_rs::{create_chart, sample_candles, Color};
+use relm4::gtk;
+use relm4::gtk::prelude::*;
 
 fn main() {
-    // Create a new chart
-    let mut chart = create_chart("BTC/USD", ChartStyle::default());
+    let chart = create_chart();
+    chart.set_main_header_str("BTC/USD", "1D");
+    chart.set_background_color(Color::new(0.07, 0.09, 0.12));
+    chart.set_grid(true, Color::new(0.16, 0.19, 0.24));
 
-    // Add candlestick data
-    let candles = vec![
-        // (timestamp, open, high, low, close)
-        (1640995200, 47000.0, 47500.0, 46800.0, 47200.0),
-        (1641081600, 47200.0, 47800.0, 47100.0, 47600.0),
-        // ... more data
-    ];
+    let series = chart.add_candlestick_series();
+    series.set_data(sample_candles());
 
-    chart.add_candlestick_series(candles);
-    chart.show();
+    let app = gtk::Application::new(
+        Some("com.example.lightweight-charts-rs.basic"),
+        Default::default(),
+    );
+    app.connect_activate(move |app| {
+        let window = gtk::ApplicationWindow::new(app);
+        window.set_title(Some("Basic Candlestick"));
+        window.set_default_size(960, 540);
+
+        let drawing_area = gtk::DrawingArea::new();
+        drawing_area.set_hexpand(true);
+        drawing_area.set_vexpand(true);
+
+        let chart = chart.clone();
+        drawing_area.set_draw_func(move |_, cr, width, height| {
+            chart.draw(cr, width as f64, height as f64);
+        });
+
+        window.set_child(Some(&drawing_area));
+        window.present();
+    });
+    app.run();
 }
 ```
 
@@ -64,104 +84,70 @@ fn main() {
 ```bash
 # Run the main application
 cargo run
-
-# Run with example data
-cargo run -- --sample-data
 ```
 
-## Chart Types
-
-- **Candlestick**: Traditional OHLC candlestick charts
-- **Line**: Simple line charts for price data
-- **Histogram**: Volume and indicator visualization
-
-## Technical Indicators
-
-- **RSI** (Relative Strength Index)
-- **MACD** (Moving Average Convergence Divergence)
-- **Bollinger Bands**
-- **SMA** (Simple Moving Average)
-- **EMA** (Exponential Moving Average)
-- **Stochastic Oscillator**
-- **StochRSI** (Stochastic RSI)
-
-## Configuration
-
-The library supports extensive customization through the `ChartStyle` and `PriceScaleOptions` structs:
-
-```rust
-use lightweight_charts_rs::{ChartStyle, PriceScaleOptions, Color};
-
-let style = ChartStyle {
-    background_color: Color::from_rgb(24, 26, 27),
-    grid_color: Color::from_rgb(44, 46, 47),
-    text_color: Color::from_rgb(200, 200, 200),
-    // ... more options
-};
-```
-
-## Development
-
-### Prerequisites
-
-- Rust 1.70+ (edition 2021)
-- GTK4 development libraries
-- Cairo development libraries
-
-### Building
+### Running Examples
 
 ```bash
-# Development build
-cargo build
-
-# Release build
-cargo build --release
-
-# Run tests
-cargo test
-
-# Run with debug output
-RUST_LOG=debug cargo run
+cargo run --example basic_chart
+cargo run --example line_chart
+cargo run --example indicators
+cargo run --example realtime
 ```
 
-### Project Structure
+## Project Structure
 
 ```
 src/
-├── app/              # Main application logic
-├── chart/            # Core charting functionality
-├── indicators/       # Technical indicators
-├── ui/               # UI components and styling
-├── settings_ui/      # Settings panel implementation
-└── main.rs           # Application entry point
+|-- app/           # Desktop application and wiring
+|-- chart/         # Core charting engine
+|-- indicators/    # Technical indicators
+|-- ui/            # UI components and styling
+|-- settings_ui/   # Settings panel
+`-- main.rs        # Application entry point
 ```
+
+## Desktop-Only Scope
+
+- This is a GTK4 desktop project for Linux, Windows, and macOS.
+- No web or mobile targets are planned.
+- REST and WebSocket are used only for data ingestion.
+
+## Roadmap (Condensed)
+
+- **Series parity with Lightweight Charts v5.1**: Area, Bar, Baseline, Custom Series, plugins/primitives, conflation, localization, price line listing, crosshair improvements.
+- **Drawing tools**: Trendline, Fibonacci, channels, long/short position tools, persistence.
+- **UX and professionalism**: Themes, improved tooltips, layout/workspaces, watchlists, alerts.
+- **Performance**: Conflation, culling, caching, profiling.
+- **Rendering**: Pango/PangoCairo text layout integration.
+- **Modular layout**: Separated UI sections with clear bounds and event routing.
+- **Multi-chart**: Linked time scale and crosshair sync.
+
+## Planning Docs (In `docs/`)
+
+- `docs/lightweight-charts-v5.1-gap-plan.md`
+- `docs/pango-plan.md`
+- `docs/other-libs-plan.md`
+- `docs/ux-professional-improvements.md`
+- `docs/ux-pro-backlog.md`
+- `docs/areas-modularization.md`
+- `docs/modular-areas-technical-proposal.md`
+- `docs/future-proposals.md`
+- `docs/future-proposals-backlog.md`
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+We welcome contributions! Please see `CONTRIBUTING.md` for guidelines.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see `LICENSE` for details.
 
 ## Acknowledgments
 
 - Inspired by [Lightweight Charts](https://github.com/tradingview/lightweight-charts) by TradingView
 - Built with [Relm4](https://relm4.org/) for modern Rust GUI development
 - Uses [GTK4](https://www.gtk.org/) for cross-platform native UI
-
-## Roadmap
-
-- [ ] More technical indicators
-- [ ] Drawing tools support
-- [ ] Chart export functionality
-- [ ] Plugin system for custom indicators
-
-## Support
-
-- [Documentation](https://docs.rs/lightweight-charts-rs)
-- [Bug Reports](https://github.com/lucasmanoguerra/lightweight-charts-rs/issues)
-- [Discussions](https://github.com/lucasmanoguerra/lightweight-charts-rs/discussions)
 
 ---
 
