@@ -1,4 +1,5 @@
 use crate::chart::{Candle, LinePoint};
+use std::collections::VecDeque;
 use time::OffsetDateTime;
 
 pub fn compute_sma(candles: &[Candle], period: usize) -> Vec<LinePoint> {
@@ -7,15 +8,14 @@ pub fn compute_sma(candles: &[Candle], period: usize) -> Vec<LinePoint> {
     }
     let mut out = Vec::with_capacity(candles.len());
     let mut sum = 0.0;
-    let mut window = Vec::with_capacity(period);
+    let mut window = VecDeque::with_capacity(period);
     for candle in candles {
         sum += candle.close;
-        window.push(candle.close);
+        window.push_back(candle.close);
         if window.len() > period {
-            if let Some(first) = window.first().copied() {
+            if let Some(first) = window.pop_front() {
                 sum -= first;
             }
-            window.remove(0);
         }
         if window.len() == period {
             let value = sum / period as f64;
@@ -34,15 +34,14 @@ pub fn compute_sma_for_times(values: &[(OffsetDateTime, f64)], period: usize) ->
     }
     let mut out = Vec::with_capacity(values.len());
     let mut sum = 0.0;
-    let mut window = Vec::with_capacity(period);
+    let mut window = VecDeque::with_capacity(period);
     for (time, value) in values {
         sum += value;
-        window.push(*value);
+        window.push_back(*value);
         if window.len() > period {
-            if let Some(first) = window.first().copied() {
+            if let Some(first) = window.pop_front() {
                 sum -= first;
             }
-            window.remove(0);
         }
         if window.len() == period {
             out.push(LinePoint {
