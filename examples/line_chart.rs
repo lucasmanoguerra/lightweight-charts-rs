@@ -1,33 +1,46 @@
-use lightweight_charts_rs::{create_chart, ChartStyle, Color, LinePoint, LineSeriesApi};
+use lightweight_charts_rs::{create_chart, sample_candles, Color, LinePoint};
+use relm4::gtk;
+use relm4::gtk::prelude::*;
 
 fn main() {
-    // Create a chart with light theme
-    let mut chart = create_chart(
-        "EUR/USD",
-        ChartStyle {
-            background_color: Color::from_rgb(255, 255, 255),
-            grid_color: Color::from_rgb(230, 230, 230),
-            text_color: Color::from_rgb(50, 50, 50),
-            ..ChartStyle::default()
-        },
+    let chart = create_chart();
+    chart.set_main_header_str("EUR/USD", "1D");
+    chart.set_background_color(Color::new(0.07, 0.09, 0.12));
+    chart.set_grid(true, Color::new(0.16, 0.19, 0.24));
+    chart.set_line_color(Color::new(0.33, 0.62, 0.98));
+
+    let candles = sample_candles();
+    let points: Vec<LinePoint> = candles
+        .iter()
+        .map(|candle| LinePoint {
+            time: candle.time,
+            value: candle.close,
+        })
+        .collect();
+
+    let series = chart.add_line_series();
+    series.set_data(points);
+
+    let app = gtk::Application::new(
+        Some("com.example.lightweight-charts-rs.line"),
+        Default::default(),
     );
+    app.connect_activate(move |app| {
+        let window = gtk::ApplicationWindow::new(app);
+        window.set_title(Some("Line Chart"));
+        window.set_default_size(960, 540);
 
-    // Sample line chart data
-    let line_data = vec![
-        // (timestamp, value)
-        (1640995200, 1.1350),
-        (1641081600, 1.1375),
-        (1641168000, 1.1340),
-        (1641254400, 1.1385),
-        (1641340800, 1.1360),
-        (1641427200, 1.1395),
-        (1641513600, 1.1410),
-        (1641600000, 1.1370),
-    ];
+        let drawing_area = gtk::DrawingArea::new();
+        drawing_area.set_hexpand(true);
+        drawing_area.set_vexpand(true);
 
-    // Add line series to the chart
-    chart.add_line_series(line_data);
+        let chart = chart.clone();
+        drawing_area.set_draw_func(move |_, cr, width, height| {
+            chart.draw(cr, width as f64, height as f64);
+        });
 
-    // Display the chart
-    chart.show();
+        window.set_child(Some(&drawing_area));
+        window.present();
+    });
+    app.run();
 }

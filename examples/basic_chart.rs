@@ -1,33 +1,36 @@
-use lightweight_charts_rs::{create_chart, CandlestickSeriesApi, ChartStyle, Color};
+use lightweight_charts_rs::{create_chart, sample_candles, Color};
+use relm4::gtk;
+use relm4::gtk::prelude::*;
 
 fn main() {
-    // Create a new chart with custom styling
-    let mut chart = create_chart(
-        "BTC/USD",
-        ChartStyle {
-            background_color: Color::from_rgb(24, 26, 27),
-            grid_color: Color::from_rgb(44, 46, 47),
-            text_color: Color::from_rgb(200, 200, 200),
-            ..ChartStyle::default()
-        },
+    let chart = create_chart();
+    chart.set_main_header_str("BTC/USD", "1D");
+    chart.set_background_color(Color::new(0.07, 0.09, 0.12));
+    chart.set_grid(true, Color::new(0.16, 0.19, 0.24));
+
+    let series = chart.add_candlestick_series();
+    series.set_data(sample_candles());
+
+    let app = gtk::Application::new(
+        Some("com.example.lightweight-charts-rs.basic"),
+        Default::default(),
     );
+    app.connect_activate(move |app| {
+        let window = gtk::ApplicationWindow::new(app);
+        window.set_title(Some("Basic Candlestick"));
+        window.set_default_size(960, 540);
 
-    // Sample candlestick data
-    let candles = vec![
-        // (timestamp, open, high, low, close)
-        (1640995200, 47000.0, 47500.0, 46800.0, 47200.0),
-        (1641081600, 47200.0, 47800.0, 47100.0, 47600.0),
-        (1641168000, 47600.0, 48200.0, 47400.0, 47900.0),
-        (1641254400, 47900.0, 48500.0, 47700.0, 48300.0),
-        (1641340800, 48300.0, 48800.0, 48000.0, 48500.0),
-        (1641427200, 48500.0, 49000.0, 48200.0, 48700.0),
-        (1641513600, 48700.0, 49200.0, 48500.0, 49000.0),
-        (1641600000, 49000.0, 49500.0, 48700.0, 49200.0),
-    ];
+        let drawing_area = gtk::DrawingArea::new();
+        drawing_area.set_hexpand(true);
+        drawing_area.set_vexpand(true);
 
-    // Add candlestick series to the chart
-    chart.add_candlestick_series(candles);
+        let chart = chart.clone();
+        drawing_area.set_draw_func(move |_, cr, width, height| {
+            chart.draw(cr, width as f64, height as f64);
+        });
 
-    // Display the chart
-    chart.show();
+        window.set_child(Some(&drawing_area));
+        window.present();
+    });
+    app.run();
 }

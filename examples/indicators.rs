@@ -1,43 +1,46 @@
-use lightweight_charts_rs::{
-    create_chart,
-    indicators::{RSI, SMA},
-    CandlestickSeriesApi, ChartStyle, Color,
-};
+use lightweight_charts_rs::indicators::{compute_rsi, compute_sma};
+use lightweight_charts_rs::{create_chart, sample_candles, Color};
+use relm4::gtk;
+use relm4::gtk::prelude::*;
 
 fn main() {
-    // Create chart
-    let mut chart = create_chart("BTC/USD", ChartStyle::default());
+    let chart = create_chart();
+    chart.set_main_header_str("BTC/USD", "1D");
+    chart.set_background_color(Color::new(0.07, 0.09, 0.12));
+    chart.set_grid(true, Color::new(0.16, 0.19, 0.24));
 
-    // Sample price data
-    let candles = vec![
-        (1640995200, 47000.0, 47500.0, 46800.0, 47200.0),
-        (1641081600, 47200.0, 47800.0, 47100.0, 47600.0),
-        (1641168000, 47600.0, 48200.0, 47400.0, 47900.0),
-        (1641254400, 47900.0, 48500.0, 47700.0, 48300.0),
-        (1641340800, 48300.0, 48800.0, 48000.0, 48500.0),
-        (1641427200, 48500.0, 49000.0, 48200.0, 48700.0),
-        (1641513600, 48700.0, 49200.0, 48500.0, 49000.0),
-        (1641600000, 49000.0, 49500.0, 48700.0, 49200.0),
-        (1641686400, 49200.0, 49800.0, 49000.0, 49600.0),
-        (1641772800, 49600.0, 50200.0, 49400.0, 50000.0),
-        (1641859200, 50000.0, 50500.0, 49800.0, 50300.0),
-        (1641945600, 50300.0, 50800.0, 50100.0, 50600.0),
-        (1642032000, 50600.0, 51100.0, 50400.0, 50900.0),
-        (1642118400, 50900.0, 51400.0, 50700.0, 51200.0),
-        (1642204800, 51200.0, 51700.0, 51000.0, 51500.0),
-    ];
+    let candles = sample_candles();
 
-    // Add candlestick series
-    chart.add_candlestick_series(candles.clone());
+    let candle_series = chart.add_candlestick_series();
+    candle_series.set_data(candles.clone());
 
-    // Calculate and add SMA indicator
-    let sma = SMA::new(14).calculate(&candles);
-    chart.add_line_series(sma);
+    let sma_points = compute_sma(&candles, 6);
+    let sma_series = chart.add_line_series();
+    sma_series.set_data(sma_points);
 
-    // Calculate and add RSI indicator
-    let rsi_values = RSI::new(14).calculate(&candles);
-    chart.add_indicator_panel("RSI", rsi_values);
+    let rsi_points = compute_rsi(&candles, 14);
+    chart.set_rsi_panel_with_title("RSI", rsi_points);
 
-    // Display the chart
-    chart.show();
+    let app = gtk::Application::new(
+        Some("com.example.lightweight-charts-rs.indicators"),
+        Default::default(),
+    );
+    app.connect_activate(move |app| {
+        let window = gtk::ApplicationWindow::new(app);
+        window.set_title(Some("Indicators"));
+        window.set_default_size(960, 540);
+
+        let drawing_area = gtk::DrawingArea::new();
+        drawing_area.set_hexpand(true);
+        drawing_area.set_vexpand(true);
+
+        let chart = chart.clone();
+        drawing_area.set_draw_func(move |_, cr, width, height| {
+            chart.draw(cr, width as f64, height as f64);
+        });
+
+        window.set_child(Some(&drawing_area));
+        window.present();
+    });
+    app.run();
 }

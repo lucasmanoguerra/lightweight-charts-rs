@@ -16,7 +16,7 @@ cargo run --example line_chart
 # Technical indicators
 cargo run --example indicators
 
-# Real-time data (requires WebSocket connection)
+# Live updates (simulated)
 cargo run --example realtime
 ```
 
@@ -32,7 +32,7 @@ Shows how to create a line chart with a light theme and line data points.
 Illustrates adding technical indicators (SMA and RSI) to a candlestick chart.
 
 ### `realtime.rs`
-Example of connecting to a WebSocket data source for live market data updates.
+Example of live updates using a timer (can be wired to REST/WebSocket data sources).
 
 ## Building All Examples
 
