@@ -87,8 +87,12 @@ pub fn spawn_kline_stream(symbol: String, interval: String, sender: Sender<DataE
     thread::spawn(move || {
         let stream = format!("{}@kline_{}", symbol.to_lowercase(), interval);
         let url = format!("wss://stream.binance.com:9443/ws/{}", stream);
+        let Ok(url) = Url::parse(&url) else {
+            eprintln!("Invalid WebSocket URL: {url}");
+            return;
+        };
         loop {
-            let connect_result = connect(Url::parse(&url).unwrap());
+            let connect_result = connect(url.clone());
             match connect_result {
                 Ok((mut socket, _)) => loop {
                     match socket.read_message() {
