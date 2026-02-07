@@ -1,6 +1,6 @@
 # Examples
 
-This directory contains example programs demonstrating how to use the lightweight-charts-rs library.
+This directory contains example programs demonstrating how to use the lightweight-charts-rs library. All examples are desktop-only and run as native GTK4 applications. The only network-facing examples are REST and WebSocket data sources.
 
 ## Running Examples
 

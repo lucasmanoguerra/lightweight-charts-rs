@@ -1,16 +1,16 @@
 # Lightweight Charts RS
 
-A lightweight, high-performance financial charting library written in Rust using Relm4 and GTK4. This library provides interactive financial charts with support for various technical indicators and real-time data visualization.
+A lightweight, high-performance financial charting library written in Rust using Relm4 and GTK4. This library provides interactive financial charts with support for various technical indicators and real-time data visualization. The project is desktop-only (Linux, Windows, macOS). It does not target web or mobile platforms; the only network-facing pieces are optional REST and WebSocket data sources.
 
 ## Features
 
-- 📊 **Interactive Charts**: Candlestick, line, and histogram chart types
-- 📈 **Technical Indicators**: Built-in support for RSI, MACD, Bollinger Bands, SMA, EMA, Stochastic, and StochRSI
-- 🔄 **Real-time Data**: WebSocket support for live market data
-- 🎨 **Customizable**: Extensive styling and configuration options
-- 📱 **Cross-platform**: Works on Linux, Windows, and macOS
-- ⚡ **High Performance**: Built with Rust for optimal performance
-- 🎯 **Lightweight**: Minimal dependencies and fast rendering
+- **Interactive Charts**: Candlestick, line, and histogram chart types
+- **Technical Indicators**: Built-in support for RSI, MACD, Bollinger Bands, SMA, EMA, Stochastic, and StochRSI
+- **Data Sources**: Optional REST and WebSocket support for market data
+- **Customizable**: Extensive styling and configuration options
+- **Desktop Platforms**: Linux, Windows, and macOS (no web or mobile targets)
+- **High Performance**: Built with Rust for optimal performance
+- **Lightweight**: Minimal dependencies and fast rendering
 
 ## Screenshots
 
@@ -45,7 +45,7 @@ use lightweight_charts_rs::{create_chart, CandlestickSeriesApi, ChartStyle};
 fn main() {
     // Create a new chart
     let mut chart = create_chart("BTC/USD", ChartStyle::default());
-    
+
     // Add candlestick data
     let candles = vec![
         // (timestamp, open, high, low, close)
@@ -53,7 +53,7 @@ fn main() {
         (1641081600, 47200.0, 47800.0, 47100.0, 47600.0),
         // ... more data
     ];
-    
+
     chart.add_candlestick_series(candles);
     chart.show();
 }
@@ -104,7 +104,7 @@ let style = ChartStyle {
 
 ### Prerequisites
 
-- Rust 1.70+ (edition 2024)
+- Rust 1.70+ (edition 2021)
 - GTK4 development libraries
 - Cairo development libraries
 
@@ -132,8 +132,8 @@ src/
 ├── chart/            # Core charting functionality
 ├── indicators/       # Technical indicators
 ├── ui/               # UI components and styling
-├── settings_ui/     # Settings panel implementation
-└── main.rs          # Application entry point
+├── settings_ui/      # Settings panel implementation
+└── main.rs           # Application entry point
 ```
 
 ## Contributing
@@ -156,15 +156,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [ ] Drawing tools support
 - [ ] Chart export functionality
 - [ ] Plugin system for custom indicators
-- [ ] WebAssembly support
-- [ ] Mobile app support
 
 ## Support
 
-- 📖 [Documentation](https://docs.rs/lightweight-charts-rs)
-- 🐛 [Bug Reports](https://github.com/lucasmanoguerra/lightweight-charts-rs/issues)
-- 💬 [Discussions](https://github.com/lucasmanoguerra/lightweight-charts-rs/discussions)
+- [Documentation](https://docs.rs/lightweight-charts-rs)
+- [Bug Reports](https://github.com/lucasmanoguerra/lightweight-charts-rs/issues)
+- [Discussions](https://github.com/lucasmanoguerra/lightweight-charts-rs/discussions)
 
 ---
 
-**Made with ❤️ in Rust**
+**Made with care in Rust**

@@ -1,8 +1,8 @@
 # Contributing to Lightweight Charts RS
 
-Thank you for your interest in contributing to Lightweight Charts RS! This document provides guidelines and information for contributors.
+Thank you for your interest in contributing to Lightweight Charts RS! This document provides guidelines and information for contributors. This is a desktop-only project (Linux, Windows, macOS). We do not target web, mobile, or WebAssembly platforms. The only network-facing features are optional REST and WebSocket data sources.
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -52,7 +52,7 @@ Follow the [GTK4 installation guide](https://www.gtk.org/docs/installations/wind
    cargo build
    ```
 
-## 📋 Development Workflow
+## Development Workflow
 
 ### Before You Start
 
@@ -131,7 +131,7 @@ docs: update installation instructions
    - Make requested changes
    - Keep your PR up to date
 
-## 🏗️ Code Style and Conventions
+## Code Style and Conventions
 
 ### Rust Guidelines
 
@@ -148,12 +148,12 @@ docs: update installation instructions
 src/
 ├── app/              # Application logic and state
 ├── chart/            # Core charting functionality
-│   ├── core/        # Core chart rendering
+│   ├── core/         # Core chart rendering
 │   └── api.rs        # Public API
 ├── indicators/       # Technical indicators
 ├── ui/               # UI components
 ├── settings_ui/      # Settings panel
-└── lib.rs           # Library exports
+└── lib.rs            # Library exports
 ```
 
 ### Naming Conventions
@@ -163,7 +163,7 @@ src/
 - **Constants**: `SCREAMING_SNAKE_CASE`
 - **Modules**: `snake_case`
 
-## 📖 Documentation
+## Documentation
 
 ### Code Documentation
 
@@ -196,7 +196,7 @@ Update the README when:
 - Updating API usage examples
 - Modifying supported platforms
 
-## 🐛 Bug Reports
+## Bug Reports
 
 When reporting bugs:
 1. Use the bug report template
@@ -205,7 +205,7 @@ When reporting bugs:
 4. Add screenshots if applicable
 5. Include full error messages and stack traces
 
-## 💡 Feature Requests
+## Feature Requests
 
 When suggesting features:
 1. Check if it already exists or is planned
@@ -214,7 +214,7 @@ When suggesting features:
 4. Suggest API design if possible
 5. Break down large features into smaller tasks
 
-## 🎯 Development Areas
+## Development Areas
 
 We welcome contributions in these areas:
 
@@ -232,28 +232,26 @@ We welcome contributions in these areas:
 
 ### Low Priority
 - Plugin system architecture
-- Mobile app support
-- WebAssembly compilation
 - Advanced chart types
 
-## 🏆 Recognition
+## Recognition
 
 Contributors are recognized in:
 - README contributors section
 - Release notes
 - Documentation acknowledgments
 
-## 📞 Getting Help
+## Getting Help
 
 - **Discussions**: [GitHub Discussions](https://github.com/lucasmanoguerra/lightweight-charts-rs/discussions)
 - **Issues**: [GitHub Issues](https://github.com/lucasmanoguerra/lightweight-charts-rs/issues)
 - **Documentation**: [API Docs](https://docs.rs/lightweight-charts-rs)
 
-## 📜 Code of Conduct
+## Code of Conduct
 
 Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md). We expect all contributors to be respectful and inclusive.
 
-## 🔄 Release Process
+## Release Process
 
 1. Update version in `Cargo.toml`
 2. Update CHANGELOG.md
@@ -263,4 +261,4 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md). We expect all 
 
 ---
 
-Thank you for contributing to Lightweight Charts RS! 🎉
+Thank you for contributing to Lightweight Charts RS!
