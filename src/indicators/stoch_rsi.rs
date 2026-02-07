@@ -1,5 +1,6 @@
 use crate::chart::{Candle, LinePoint};
 use crate::indicators::rsi::compute_rsi;
+use std::collections::VecDeque;
 
 pub struct StochRsiSeries {
     pub k: Vec<LinePoint>,
@@ -46,17 +47,20 @@ pub fn compute_stoch_rsi(
 
     let mut d_line = Vec::new();
     if d_period > 0 {
-        let mut window: Vec<f64> = Vec::with_capacity(d_period);
+        let mut window: VecDeque<f64> = VecDeque::with_capacity(d_period);
+        let mut sum = 0.0;
         for (time, value) in &k_values {
-            window.push(*value);
+            window.push_back(*value);
+            sum += value;
             if window.len() > d_period {
-                window.remove(0);
+                if let Some(first) = window.pop_front() {
+                    sum -= first;
+                }
             }
             if window.len() == d_period {
-                let avg = window.iter().sum::<f64>() / d_period as f64;
                 d_line.push(LinePoint {
                     time: *time,
-                    value: avg,
+                    value: sum / d_period as f64,
                 });
             }
         }
