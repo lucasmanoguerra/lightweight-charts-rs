@@ -3,6 +3,11 @@ Guía operativa para agentes automáticos y contribuciones de código.
 Este proyecto es una plataforma de análisis financiero en tiempo real similar a TradingView.
 Prioridades absolutas: simplicidad, modularidad, rendimiento y verificabilidad.
 
+
+Toda nueva UI debe implementarse como Area independiente.
+Nunca agregar lógica al ChartView directamente.
+Si algo no puede desacoplarse como Area → rediseñar.
+
 ====================================================================
 FILOSOFÍA GENERAL
 ====================================================================
