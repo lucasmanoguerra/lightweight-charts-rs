@@ -9,19 +9,25 @@ repository = "https://github.com/lucasmanoguerra/lightweight-charts-rs"
 homepage = "https://github.com/lucasmanoguerra/lightweight-charts-rs"
 documentation = "https://docs.rs/lightweight-charts-rs"
 readme = "README.md"
-keywords = ["chart", "financial", "trading", "candlestick", "technical-analysis"]
+keywords = [
+    "chart",
+    "financial",
+    "trading",
+    "candlestick",
+    "technical-analysis",
+]
 categories = ["gui", "visualization", "financial"]
 rust-version = "1.70"
 
 [dependencies]
-relm4 = { version = "0.10", default-features = true }
-cairo-rs = "0.21"
-time = "0.3"
-rust_decimal = "1"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-toml = "0.8"
-ureq = { version = "2", features = ["json"] }
-tungstenite = { version = "0.21", features = ["native-tls"] }
-url = "2"
-resvg = "0.41"
+relm4 = { version = "0.10.1", default-features = true }
+cairo-rs = "0.21.5"
+time = "0.3.47"
+rust_decimal = "1.40.0"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+toml = "0.9.11"
+ureq = { version = "3.2.0", features = ["json"] }
+tungstenite = { version = "0.28.0", features = ["native-tls"] }
+url = "2.5.8"
+resvg = "0.46.0"

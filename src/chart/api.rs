@@ -734,6 +734,12 @@ impl ChartApi {
             .set_crosshair_snap_to_series(enabled);
     }
 
+    pub fn set_crosshair_do_not_snap_to_hidden_series_indices(&self, enabled: bool) {
+        self.inner
+            .borrow_mut()
+            .set_crosshair_do_not_snap_to_hidden_series_indices(enabled);
+    }
+
     pub fn set_time_scale_min_bar_spacing(&self, value: f64) {
         self.inner
             .borrow_mut()

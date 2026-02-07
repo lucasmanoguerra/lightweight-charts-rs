@@ -144,6 +144,10 @@ impl ChartCore {
         self.options.crosshair.snap_to_series = enabled;
     }
 
+    pub(crate) fn set_crosshair_do_not_snap_to_hidden_series_indices(&mut self, enabled: bool) {
+        self.options.crosshair.do_not_snap_to_hidden_series_indices = enabled;
+    }
+
     pub(crate) fn set_crosshair_mode(&mut self, mode: CrosshairMode) {
         self.options.crosshair.mode = mode;
     }

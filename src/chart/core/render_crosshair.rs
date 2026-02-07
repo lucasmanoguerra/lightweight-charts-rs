@@ -121,6 +121,18 @@ impl ChartCore {
                         if series.scale != side {
                             continue;
                         }
+                        if self
+                            .options
+                            .crosshair
+                            .do_not_snap_to_hidden_series_indices
+                            && match &series.data {
+                                SeriesData::Candlestick { data } => data.is_empty(),
+                                SeriesData::Line { data } => data.is_empty(),
+                                SeriesData::Histogram { data } => data.is_empty(),
+                            }
+                        {
+                            continue;
+                        }
                         match &series.data {
                             SeriesData::Line { data } => {
                                 if let Some(point) = nearest_by_time(data, target_time) {

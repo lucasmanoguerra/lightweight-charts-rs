@@ -45,6 +45,7 @@ pub struct CrosshairOptions {
     pub center_color: Color,
     pub snap_to_ohlc: bool,
     pub snap_to_series: bool,
+    pub do_not_snap_to_hidden_series_indices: bool,
 }
 
 impl Default for CrosshairOptions {
@@ -61,6 +62,7 @@ impl Default for CrosshairOptions {
             center_color: color,
             snap_to_ohlc: true,
             snap_to_series: true,
+            do_not_snap_to_hidden_series_indices: false,
         }
     }
 }

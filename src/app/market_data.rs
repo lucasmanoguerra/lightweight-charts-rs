@@ -272,7 +272,11 @@ fn build_klines_url(
 
 fn fetch_klines_from_url(url: &str) -> Result<Vec<Value>, String> {
     let response = ureq::get(url).call().map_err(|e| e.to_string())?;
-    let value: Value = response.into_json().map_err(|e| e.to_string())?;
+    let body = response
+        .into_body()
+        .read_to_string()
+        .map_err(|e| e.to_string())?;
+    let value: Value = serde_json::from_str(&body).map_err(|e| e.to_string())?;
     value
         .as_array()
         .cloned()

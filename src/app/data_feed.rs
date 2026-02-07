@@ -92,17 +92,17 @@ pub fn spawn_kline_stream(symbol: String, interval: String, sender: Sender<DataE
             return;
         };
         loop {
-            let connect_result = connect(url.clone());
+            let connect_result = connect(url.as_str());
             match connect_result {
                 Ok((mut socket, _)) => loop {
-                    match socket.read_message() {
+                    match socket.read() {
                         Ok(Message::Text(text)) => {
                             if let Some(event) = parse_kline_message(&text) {
                                 let _ = sender.send(DataEvent::Kline(event));
                             }
                         }
                         Ok(Message::Ping(payload)) => {
-                            let _ = socket.write_message(Message::Pong(payload));
+                            let _ = socket.send(Message::Pong(payload));
                         }
                         Ok(Message::Close(_)) => break,
                         Ok(_) => {}

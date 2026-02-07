@@ -1,6 +1,6 @@
 use cairo::{Context, Format, ImageSurface};
 use resvg::{tiny_skia, usvg};
-use std::sync::OnceLock;
+use std::sync::{Arc, OnceLock};
 
 use crate::chart::Color;
 
@@ -95,12 +95,12 @@ fn marker_svg_source(text: &str) -> Option<&'static str> {
     }
 }
 
-fn fontdb() -> &'static usvg::fontdb::Database {
-    static FONT_DB: OnceLock<usvg::fontdb::Database> = OnceLock::new();
+fn fontdb() -> &'static Arc<usvg::fontdb::Database> {
+    static FONT_DB: OnceLock<Arc<usvg::fontdb::Database>> = OnceLock::new();
     FONT_DB.get_or_init(|| {
         let mut db = usvg::fontdb::Database::new();
         db.load_system_fonts();
-        db
+        Arc::new(db)
     })
 }
 
@@ -117,8 +117,9 @@ fn draw_svg_source(cr: &Context, svg_source: &str, x: f64, y: f64, size: f64, co
     );
 
     let svg = svg_source.replace("currentColor", &color_hex);
-    let options = usvg::Options::default();
-    let tree = match usvg::Tree::from_str(&svg, &options, fontdb()) {
+    let mut options = usvg::Options::default();
+    options.fontdb = fontdb().clone();
+    let tree = match usvg::Tree::from_str(&svg, &options) {
         Ok(tree) => tree,
         Err(_) => return,
     };
