@@ -173,6 +173,18 @@ impl ChartApi {
         self.inner.borrow_mut().set_rsi_panel(title, data);
     }
 
+    /// Sets up an RSI panel with the given title and data (avoids allocating a `String`).
+    ///
+    /// # Arguments
+    ///
+    /// * `title` - The title to display for the RSI panel
+    /// * `data` - A vector of line points representing the RSI values
+    pub fn set_rsi_panel_with_title(&self, title: &str, data: Vec<LinePoint>) {
+        self.inner
+            .borrow_mut()
+            .set_rsi_panel(title.to_string(), data);
+    }
+
     /// Updates the data for the existing RSI panel.
     ///
     /// # Arguments
@@ -184,6 +196,21 @@ impl ChartApi {
     /// Panics if no RSI panel has been created yet.
     pub fn set_rsi_panel_data(&self, data: Vec<LinePoint>) {
         self.inner.borrow_mut().set_rsi_panel_data(data);
+    }
+
+    /// Updates the data for the existing RSI panel.
+    ///
+    /// This is a non-panicking variant of `set_rsi_panel_data`.
+    ///
+    /// # Returns
+    ///
+    /// `true` if the RSI panel exists and was updated, `false` otherwise.
+    pub fn try_set_rsi_panel_data(&self, data: Vec<LinePoint>) -> bool {
+        if !self.has_rsi_panel() {
+            return false;
+        }
+        self.inner.borrow_mut().set_rsi_panel_data(data);
+        true
     }
 
     /// Clears and removes the RSI panel from the chart.
@@ -222,6 +249,21 @@ impl ChartApi {
         self.inner.borrow_mut().set_rsi_color(color);
     }
 
+    /// Sets the color of the RSI panel line.
+    ///
+    /// This is a non-panicking variant of `set_rsi_color`.
+    ///
+    /// # Returns
+    ///
+    /// `true` if the RSI panel exists and was updated, `false` otherwise.
+    pub fn try_set_rsi_color(&self, color: Color) -> bool {
+        if !self.has_rsi_panel() {
+            return false;
+        }
+        self.inner.borrow_mut().set_rsi_color(color);
+        true
+    }
+
     /// Sets whether the RSI panel should use auto-scaling.
     ///
     /// # Arguments
@@ -235,6 +277,21 @@ impl ChartApi {
         self.inner.borrow_mut().set_rsi_auto_scale(enabled);
     }
 
+    /// Sets whether the RSI panel should use auto-scaling.
+    ///
+    /// This is a non-panicking variant of `set_rsi_auto_scale`.
+    ///
+    /// # Returns
+    ///
+    /// `true` if the RSI panel exists and was updated, `false` otherwise.
+    pub fn try_set_rsi_auto_scale(&self, enabled: bool) -> bool {
+        if !self.has_rsi_panel() {
+            return false;
+        }
+        self.inner.borrow_mut().set_rsi_auto_scale(enabled);
+        true
+    }
+
     /// Sets whether the price scale for the RSI panel should be visible.
     ///
     /// # Arguments
@@ -246,6 +303,23 @@ impl ChartApi {
     /// Panics if no RSI panel has been created yet.
     pub fn set_rsi_price_scale_visible(&self, visible: bool) {
         self.inner.borrow_mut().set_rsi_price_scale_visible(visible);
+    }
+
+    /// Sets whether the price scale for the RSI panel should be visible.
+    ///
+    /// This is a non-panicking variant of `set_rsi_price_scale_visible`.
+    ///
+    /// # Returns
+    ///
+    /// `true` if the RSI panel exists and was updated, `false` otherwise.
+    pub fn try_set_rsi_price_scale_visible(&self, visible: bool) -> bool {
+        if !self.has_rsi_panel() {
+            return false;
+        }
+        self.inner
+            .borrow_mut()
+            .set_rsi_price_scale_visible(visible);
+        true
     }
 
     /// Gets the current auto-scaling setting for the RSI panel.
@@ -556,8 +630,18 @@ impl ChartApi {
         self.inner.borrow_mut().set_time_label_format(format);
     }
 
+    /// Sets the time label format without allocating a `String`.
+    pub fn set_time_label_format_str(&self, format: &str) {
+        self.inner.borrow_mut().set_time_label_format(format.to_string());
+    }
+
     pub fn set_tooltip_format(&self, format: String) {
         self.inner.borrow_mut().set_tooltip_format(format);
+    }
+
+    /// Sets the tooltip format without allocating a `String`.
+    pub fn set_tooltip_format_str(&self, format: &str) {
+        self.inner.borrow_mut().set_tooltip_format(format.to_string());
     }
 
     pub fn set_tooltip_colors(&self, background: Color, text: Color) {
@@ -576,8 +660,22 @@ impl ChartApi {
         self.inner.borrow_mut().set_tooltip_line_format(format);
     }
 
+    /// Sets the tooltip line format without allocating a `String`.
+    pub fn set_tooltip_line_format_str(&self, format: &str) {
+        self.inner
+            .borrow_mut()
+            .set_tooltip_line_format(format.to_string());
+    }
+
     pub fn set_tooltip_histogram_format(&self, format: String) {
         self.inner.borrow_mut().set_tooltip_histogram_format(format);
+    }
+
+    /// Sets the tooltip histogram format without allocating a `String`.
+    pub fn set_tooltip_histogram_format_str(&self, format: &str) {
+        self.inner
+            .borrow_mut()
+            .set_tooltip_histogram_format(format.to_string());
     }
 
     pub fn set_crosshair_visibility(&self, vertical: bool, horizontal: bool) {
@@ -698,6 +796,13 @@ impl ChartApi {
             .set_time_scale_tick_mark_format(format);
     }
 
+    /// Sets the time scale tick mark format without allocating a `String`.
+    pub fn set_time_scale_tick_mark_format_str(&self, format: &str) {
+        self.inner
+            .borrow_mut()
+            .set_time_scale_tick_mark_format(format.to_string());
+    }
+
     pub fn set_time_scale_tick_mark_max_len(&self, len: usize) {
         self.inner
             .borrow_mut()
@@ -780,6 +885,13 @@ impl ChartApi {
 
     pub fn set_main_header(&self, symbol: String, timeframe: String) {
         self.inner.borrow_mut().set_main_header(symbol, timeframe);
+    }
+
+    /// Sets the main header without allocating `String`s.
+    pub fn set_main_header_str(&self, symbol: &str, timeframe: &str) {
+        self.inner
+            .borrow_mut()
+            .set_main_header(symbol.to_string(), timeframe.to_string());
     }
 
     pub fn set_price_scale_options(&self, side: PriceScale, options: PriceScaleOptions) {
